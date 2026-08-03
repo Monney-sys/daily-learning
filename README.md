@@ -44,6 +44,7 @@
 | 主题 | 文件 |
 |------|------|
 | **XSS 入门认知框架** — 原理/反射型·存储型·DOM 型/利用手法/绕过(WAF·HttpOnly·代码过滤)/防御方案 | [2026-08-02-XSS跨站脚本攻击入门.md](./2026-08-02-XSS跨站脚本攻击入门.md) |
+| **XSS 平台与工具 + HttpOnly 绕过** — BeEF/XSS Hunter/ezXSS 平台利用、XSStrike/Dalfox 工具、HttpOnly 防偷不防用原理、XSS Labs 1~13 实战 | [2026-08-03-XSS平台工具与HttpOnly绕过.md](./2026-08-03-XSS平台工具与HttpOnly绕过.md) |
 
 ### 操作系统与第三方安全
 | 主题 | 文件 |
@@ -66,7 +67,7 @@
 | 2026-07-30 | SQL 注入 WAF 绕过技术体系 + SQLi-Labs Less-5/6/7 实战 |
 | **2026-07-31** | **文件上传漏洞体系 — 验证/绕过/解析漏洞/编辑器/CMS/CVE + Upload Labs Pass-01~07** |
 | **2026-08-02** | **文件上传 WAF 绕过与防御 + XSS 跨站脚本攻击入门 + SQLi-Labs Less-17~20** |
-| **2026-08-03** | **SQLi-Labs Less-21~25 — Cookie+Base64 / 注释符过滤 / 二次注入 / AND/OR 绕过** |
+| **2026-08-03** | **SQLi-Labs Less-21~25 + XSS 平台工具/HttpOnly 绕过 + XSS Labs 1~13** |
 
 ---
 
