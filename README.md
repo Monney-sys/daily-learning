@@ -47,6 +47,11 @@
 | **XSS 平台与工具 + HttpOnly 绕过** — BeEF/XSS Hunter/ezXSS 平台利用、XSStrike/Dalfox 工具、HttpOnly 防偷不防用原理、XSS Labs 1~13 实战 | [2026-08-03-XSS平台工具与HttpOnly绕过.md](./2026-08-03-XSS平台工具与HttpOnly绕过.md) |
 | **XSS WAF 绕过体系 + 安全修复** — 12 种绕过手法（标签替换/编码/混淆/溢出/HPP）+ CSP/HttpOnly/输出编码纵深防御 | [2026-08-04-XSS-WAF绕过与安全修复.md](./2026-08-04-XSS-WAF绕过与安全修复.md) |
 
+### CSRF / SSRF
+| 主题 | 文件 |
+|------|------|
+| **CSRF 与 SSRF 漏洞详解** — 原理/探测方法/攻击场景/防御方案 + 内外网概念 + XSS/CSRF/SSRF 横向对比 | [2026-08-04-CSRF与SSRF漏洞详解.md](./2026-08-04-CSRF与SSRF漏洞详解.md) |
+
 ### 操作系统与第三方安全
 | 主题 | 文件 |
 |------|------|
