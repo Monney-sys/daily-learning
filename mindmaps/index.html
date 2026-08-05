@@ -7,46 +7,56 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    background: #0f0f1a; color: #ccc; font-family: -apple-system, sans-serif;
+    background: #f5f5f5; color: #333; font-family: -apple-system, sans-serif;
     display: flex; align-items: center; justify-content: center; min-height: 100vh;
   }
   .card {
-    background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 12px;
-    padding: 40px 50px; max-width: 500px; width: 90%;
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 12px;
+    padding: 40px 50px; max-width: 520px; width: 90%; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   }
-  .card h1 { color: #fff; font-size: 22px; margin-bottom: 6px; }
-  .card p.sub { color: #888; font-size: 13px; margin-bottom: 28px; }
+  .card h1 { font-size: 22px; margin-bottom: 6px; }
+  .card p.sub { color: #999; font-size: 13px; margin-bottom: 28px; }
   .card a {
     display: block; padding: 14px 18px; margin-bottom: 10px;
-    background: #16213e; border: 1px solid #2a2a5a; border-radius: 8px;
-    color: #ddd; text-decoration: none; font-size: 15px;
+    background: #fafafa; border: 1px solid #eee; border-radius: 8px;
+    color: #333; text-decoration: none; font-size: 15px;
     transition: all 0.2s;
   }
-  .card a:hover { background: #1f3060; border-color: #4a6aff; color: #fff; transform: translateX(4px); }
-  .card a .emoji { margin-right: 8px; font-size: 18px; }
-  .card a .date { float: right; color: #666; font-size: 12px; margin-top: 2px; }
-  .footer { margin-top: 24px; font-size: 12px; color: #555; text-align: center; }
-  .footer a { color: #666; display: inline; padding: 0; background: none; border: none; }
+  .card a:hover { background: #f0f6ff; border-color: #4a6aff; color: #1a3a8a; transform: translateX(4px); }
+  .card a .dot {
+    display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; vertical-align: middle;
+  }
+  .footer { margin-top: 24px; font-size: 12px; color: #bbb; text-align: center; }
 </style>
 </head>
 <body>
 <div class="card">
   <h1>🧠 思维导图索引</h1>
-  <p class="sub">滚轮缩放 · 拖拽平移 · 彩色分区 · 点击「返回」回笔记</p>
+  <p class="sub">滚轮缩放 · 拖拽平移 · 点击节点折叠 · 白底纯净树状图</p>
+
+  <a href="SQL注入.html">
+    <span class="dot" style="background:#e74c3c"></span> SQL 注入
+  </a>
+
+  <a href="XSS跨站脚本.html">
+    <span class="dot" style="background:#f39c12"></span> XSS 跨站脚本
+  </a>
+
+  <a href="文件上传漏洞.html">
+    <span class="dot" style="background:#3498db"></span> 文件上传漏洞
+  </a>
+
+  <a href="CSRF与SSRF.html">
+    <span class="dot" style="background:#9b59b6"></span> CSRF 与 SSRF 请求伪造
+  </a>
 
   <a href="文件包含漏洞.html">
-    <span class="emoji">📂</span> 文件包含漏洞
-    <span class="date">2026-08-05</span>
+    <span class="dot" style="background:#2ecc71"></span> 文件包含漏洞
   </a>
 
   <a href="RCE远程代码命令执行.html">
-    <span class="emoji">💻</span> RCE 远程代码/命令执行
-    <span class="date">2026-08-05</span>
+    <span class="dot" style="background:#1abc9c"></span> RCE 远程代码/命令执行
   </a>
-
-  <div class="footer">
-    返回 <a href="../README.md">📖 daily-learning 笔记目录</a>
-  </div>
 </div>
 </body>
 </html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CSRF 与 SSRF</title>
+<style>* { margin: 0; padding: 0; } #m { width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; } #m svg { width: 100% !important; height: 100% !important; }</style>
+</head>
+<body>
+<div class="markmap" id="m">
+
+# 请求伪造 CSRF + SSRF
+
+## CSRF 跨站请求伪造
+- 原理
+  - 借受害者浏览器发请求
+  - Cookie 自动带上 → 以受害者身份操作
+  - 不需要知道密码
+- 三个必要条件
+  - 受害者已登录目标网站
+  - 目标有副作用操作（转账/改密码/删数据）
+  - 验证只依赖 Cookie
+- 攻击方式
+  - GET 型：img src="http://bank.com/transfer?to=hacker"
+  - POST 型：自动提交隐藏表单
+- 探测方法
+  - 找有副作用的功能（改密码/删用户/改邮箱）
+  - Burp 抓包看有没有 csrf\_token / \_token
+  - 删除 Referer 头看是否还能成功
+- 防御
+  - Anti-CSRF Token：表单内随机Token + Session校验
+  - SameSite Cookie：Strict/Lax 阻止跨站带Cookie
+  - Referer / Origin 校验：检查请求来源
+  - 二次验证：改密码需输入原密码
+  - GET 不用于修改操作
+- 和 XSS 的关系
+  - XSS 可以读到 Token → 绕过 CSRF 防御
+  - XSS 的能力是 CSRF 的严格超集
+
+## SSRF 服务器端请求伪造
+- 原理
+  - 借服务器发请求
+  - 以服务器视角（内网）访问资源
+  - 用户传 URL → 服务器 fetch → 内网穿透
+- 攻击链路
+  - 外网 → Web服务器 → 127.0.0.1:3306（MySQL）
+  - 外网 → Web服务器 → 192.168.1.x（内网机器）
+  - 外网 → Web服务器 → 169.254.169.254（云元数据）
+- 目标与危害
+  - 云元数据：获取临时凭证/AccessKey
+  - 内网端口扫描：发现内网存活服务
+  - 本地文件：file:///etc/passwd
+  - Redis 未授权：写 webshell
+  - 敏感信息：.env / 配置文件 / SSH 私钥
+- 支持的协议
+  - http:// https://
+  - file:// 读本地文件
+  - gopher:// 构造TCP包打Redis/FastCGI
+  - dict:// 端口探测 + banner
+- 去哪找
+  - URL 输入框 / 网页抓取 / 图片代理
+  - PDF 生成 / API 聚合 / Webhook
+  - 文件上传（远程URL）
+  - 参数名：url= / file= / src= / path= / target=
+- 探测方法
+  - 用自己服务器监听 → 确认服务器发包
+  - 换内网地址 → 127.0.0.1:端口
+  - 根据响应判断端口通断
+- 绕过 IP 黑名单
+  - localhost / 0.0.0.0
+  - 十进制：2130706433
+  - 十六进制：0x7f000001
+  - 八进制：0177.0.0.1
+  - nip.io DNS
+  - IPv6：[::1]
+  - 302 跳转
+- 防御
+  - URL 白名单域名
+  - 禁用危险协议（只允许 http/https）
+  - 解析域名后检查 IP 非内网
+  - 不返回原始响应内容
+  - 内网服务加密码认证
+  - 最小权限 + 网络隔离
+
+## XSS vs CSRF vs SSRF
+- 借谁的手
+  - XSS：受害者浏览器
+  - CSRF：受害者浏览器
+  - SSRF：Web 服务器
+- 请求源IP
+  - XSS：受害者IP
+  - CSRF：受害者IP
+  - SSRF：服务器IP（内网视角）
+- 核心防御
+  - XSS：输出编码 + CSP
+  - CSRF：Token + SameSite
+  - SSRF：白名单 + 禁协议 + IP检查
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.17"></script>
+</body>
+</html>

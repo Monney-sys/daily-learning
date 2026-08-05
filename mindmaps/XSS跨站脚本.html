@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>XSS 跨站脚本</title>
+<style>* { margin: 0; padding: 0; } #m { width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; } #m svg { width: 100% !important; height: 100% !important; }</style>
+</head>
+<body>
+<div class="markmap" id="m">
+
+# XSS 跨站脚本
+
+## 原理
+- 用户输入被原样拼入 HTML
+- 浏览器分不清“数据”和“代码”
+- 本质：数据和代码混淆
+- 和 SQL 注入同理，执行位置在浏览器
+
+## 分类
+- 反射型 XSS
+  - 恶意代码在 URL 参数
+  - 需要诱导点击
+  - 一次性，只影响点击者
+  - 服务器原样回显用户输入
+- 存储型 XSS
+  - 恶意代码存入数据库
+  - 不需要诱导点击
+  - 所有访问者都会中招
+  - 危害最大，漏洞挖掘首选
+- DOM 型 XSS
+  - 全程不经过服务器
+  - 前端 JS 危险 API 操作 DOM
+  - innerHTML / document.write
+  - 服务器日志无记录
+
+## 触发方式
+- script 标签
+  - &lt;script&gt;alert(1)&lt;/script&gt;
+- 标签事件
+  - &lt;img src=x onerror=alert(1)&gt;
+  - &lt;svg onload=alert(1)&gt;
+  - &lt;body onload=alert(1)&gt;
+  - &lt;input onfocus=alert(1) autofocus&gt;
+  - &lt;details open ontoggle=alert(1)&gt;
+- 伪协议
+  - &lt;a href="javascript:alert(1)"&gt;点我&lt;/a&gt;
+  - &lt;iframe src="javascript:alert(1)"&gt;
+
+## 注入位置
+- HTML 正文 &lt;p&gt;输出&lt;/p&gt;
+- HTML 属性 &lt;input value="输出"&gt;
+- JavaScript 中 var x='输出'
+- &lt;a href="输出"&gt;
+- URL 参数 / HTTP 请求头
+  - User-Agent / Referer / Cookie
+- hidden 表单字段
+  - 用 type="text" 覆盖
+
+## 绕过 WAF
+- 标签替换
+  - &lt;script&gt; 被封 → &lt;img onerror&gt; / &lt;svg onload&gt;
+- 大小写混淆
+  - &lt;ScRiPt&gt; / &lt;iMg sRc=x OnErRoR=alert(1)&gt;
+- 双写绕过
+  - &lt;scr&lt;script&gt;ipt&gt;
+  - oonnerrorror → onerror
+- 编码绕过
+  - HTML 实体：&#106;&#97;...    用于 &lt;a href&gt;
+  - URL 编码：%3Cscript%3E
+  - 双重URL编码：%253Cscript%253E
+  - Base64：eval(atob('xxx'))
+  - Unicode 编码
+- 空格替代
+  - %0a / %0d / %09 / /**/
+- 括号绕过
+  - 反引号：alert\`1\`
+  - onerror=alert;throw 1
+- 关键词拆分
+  - eval('al'+'ert(1)')
+  - window\['al'+'ert'](1)
+  - String.fromCharCode(97,108,...)
+- 伪协议编码
+  - javascript: → &#106;&#97;...:
+
+## HttpOnly
+- 原理
+  - Set-Cookie 加 HttpOnly 标记
+  - document.cookie 读不到该 Cookie
+- 防了什么
+  - ✅ 防“偷”Cookie
+  - ❌ 不防“用”Cookie
+- 绕过思路
+  - fetch 自动带 Cookie（credentials:include）
+  - 弹钓鱼窗骗用户输入密码
+  - 操控浏览器直接做操作
+- 一句话
+  - HttpOnly 把“偷钥匙”变成“趁主人在家用钥匙”
+
+## 平台 / 工具
+- BeEF
+  - 浏览器利用框架
+  - 注入 hook.js → 控制台操控浏览器
+  - 信息收集 / 社工 / 内网扫描
+- XSS Hunter / ezXSS
+  - Blind XSS 回连平台
+  - 自动截图、收集 Cookie/DOM
+- XSStrike / Dalfox
+  - 自动化扫描
+  - Dalfox 快 + DOM XSS
+  - XSStrike 精细 + WAF 分析
+- F12 + Burp
+  - 80% 的 XSS 是手工找的
+
+## 防御
+- 输出编码（核心防线）
+  - HTML 内容：htmlspecialchars(s, ENT\_QUOTES)
+  - HTML 属性：同上 + 必须加引号
+  - JavaScript：json\_encode(s)
+  - URL：urlencode(s)
+- HttpOnly Cookie
+- CSP（Content-Security-Policy）
+  - script-src 'self'
+  - 浏览器层面拒绝内联脚本
+- 输入校验（第一道防线）
+  - 白名单，拒绝不符合预期的数据
+- SameSite Cookie
+  - Strict：跨站不带 Cookie → 防 CSRF
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.17"></script>
+</body>
+</html>

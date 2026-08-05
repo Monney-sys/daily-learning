@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>文件上传漏洞</title>
+<style>* { margin: 0; padding: 0; } #m { width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; } #m svg { width: 100% !important; height: 100% !important; }</style>
+</head>
+<body>
+<div class="markmap" id="m">
+
+# 文件上传漏洞
+
+## 原理
+- 应用对用户上传文件缺乏有效校验
+- 攻击者上传可执行脚本
+- 上传 + 访问执行 = 服务器沦陷
+- 核心风险路径
+  - 上传 → 校验缺失/可绕过 → 落盘 → 访问 → 代码执行
+
+## 验证方式
+- 前端校验
+  - JS 校验后缀（仅浏览器）
+  - 绕过：禁用JS / F12改DOM / Burp抓包 / 直接构造请求
+- 后端黑名单
+  - 禁止 .php .asp .jsp 等
+  - 绕过：特殊后缀 / 大小写 / 空格 / 点 / ::DATA / 双写
+- 后端白名单
+  - 只允许特定后缀
+  - 绕过：MIME 欺骗 / %00截断 / 0x00截断 / 0x0a换行
+- 内容校验
+  - 文件头检测 → 前面加 GIF89a 绕过
+  - getimagesize() → 伪造最小图片头
+  - 二次渲染 → 图片EXIF注释藏webshell
+  - 条件竞争 → 并发上传+访问，抢在删除前
+
+## 绕过手法
+- 后缀绕过
+  - 特殊解析后缀：.php3 .php4 .php5 .phtml .pht
+  - 大小写：.Php .PHP
+  - 空格：.php（末尾空格）
+  - 点：.php.
+  - ::DATA：shell.php::DATA（Windows NTFS）
+  - 双写：shell.pphphp → shell.php
+  - .htaccess 让 .jpg 按 PHP 执行
+- 内容绕过
+  - Content-Type：image/jpeg
+  - 文件头：GIF89a + webshell
+  - 二次渲染：EXIF/Comment 藏代码
+- WAF 绕过
+  - 数据溢出：超长文件名
+  - 符号变异：引号/分号/反斜杠
+  - 数据截断：%00 / 0x00 / %0a
+  - 重复数据：双 filename / 双 Content-Disposition
+  - Content-Disposition 语法变形
+  - 分块传输 Chunked
+  - 编码：URL/双重URL/Unicode
+- 解析漏洞配合
+  - Apache：多后缀 shell.php.xxx
+  - Apache：.htaccess 配置解析
+  - Apache CVE-2017-15715：换行截断
+  - Nginx：shell.jpg/1.php（fix\_pathinfo）
+  - Nginx CVE-2013-4547：空字节
+  - IIS 6.0：1.asp;.jpg / 文件夹解析
+  - IIS 7.x：同 Nginx FastCGI
+
+## Webshell
+- 一句话木马
+  - PHP：\<?php @eval(\$_POST['cmd']); ?\>
+  - ASP：\<\%eval request("cmd")\%\>
+  - JSP：Runtime.getRuntime().exec(...)
+- 大马 vs 小马
+  - 小马：一行代码，体积小好上传
+  - 大马：完整面板，文件管理/数据库/提权
+- 连接工具
+  - 蚁剑 / 冰蝎 / 哥斯拉
+- 黑吃黑 / 供应链后门
+  - 别人的 webshell 藏传输数据代码 → 你的战果被白捡
+
+## 防御
+- 文件名校验：白名单，不接受用户输入的文件名
+- 文件重命名：UUID 随机名，扩展名后端指定
+- 内容校验：文件头 + 实际内容 + 格式完整性
+- 二次渲染：GD/ImageMagick 强制重绘
+- 存储隔离：上传目录在 Web 根目录外
+- 访问控制：上传目录禁止脚本执行权限
+- 死板防御
+  - WAF 辅助，但不能替代后端校验
+  - 攻击者绕过 WAF 只是时间问题
+  - 好的后端校验 = WAF 绕过也不出事
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.17"></script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SQL 注入</title>
+<style>* { margin: 0; padding: 0; } #m { width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; } #m svg { width: 100% !important; height: 100% !important; }</style>
+</head>
+<body>
+<div class="markmap" id="m">
+
+# SQL 注入
+
+## 原理
+- 用户输入拼入 SQL 语句
+- 数据和代码混淆 → 输入被当作 SQL 执行
+- 本质：Web 应用对用户输入缺乏校验
+
+## 类型
+- 按注入位置
+  - 数字型：id=$id
+  - 字符型：id='$id'
+  - 搜索型：LIKE '%$kw%'
+- 按回显方式
+  - Union 注入（有回显，最快）
+  - 报错注入（无回显但有报错）
+  - 布尔盲注（真/假差异）
+  - 时间盲注（sleep 延时）
+- 按 SQL 操作
+  - SELECT 注入
+  - INSERT 注入
+  - UPDATE 注入
+  - DELETE 注入
+- 高阶类型
+  - 二次注入（先存后触发）
+  - 堆叠注入（多语句执行）
+  - 加密注入（Base64/AES 编码参数）
+  - DNSLog 注入（外带数据）
+  - Cookie / Header 注入
+
+## 注入点
+- URL 参数：?id=
+- POST 表单：uname / passwd
+- HTTP 请求头
+  - User-Agent
+  - Referer
+  - X-Forwarded-For
+  - Cookie
+- 其他：搜索框、排序参数、分页参数
+
+## 闭合方式
+- 注释法
+  - --+（GET 参数用）
+  - -- 空格（通用）
+  - #（MySQL）
+  - 缺陷：INSERT VALUES 中注释会把后面字段干掉
+- 消费法
+  - ' OR xxx OR '（不依赖注释，推荐）
+  - ' AND xxx AND '
+  - '）OR xxx OR（'（有括号时）
+- 适用场景
+  - 注释法：SELECT 注入首选
+  - 消费法：INSERT/UPDATE/DELETE 必备
+
+## 核心手法
+- Union 注入
+  - ORDER BY 猜列数
+  - UNION SELECT 1,2,database()
+  - information\_schema 查库/表/字段
+- 报错注入
+  - updatexml(1,concat(0x7e,database()),1)
+  - extractvalue(1,concat(0x7e,database()))
+  - floor(rand(0)*2) 主键冲突报错
+- 布尔盲注
+  - AND 1=1 vs AND 1=2
+  - 逐字符二分法猜解
+- 时间盲注
+  - AND sleep(5)
+  - AND IF(条件,sleep(5),0)
+- 高权限利用
+  - 跨库查询：库名.表名
+  - 文件读取：LOAD\_FILE('/etc/passwd')
+  - 文件写入：INTO OUTFILE 'shell.php'
+
+## 绕过手法
+- 关键词绕过
+  - 双写：anandd → and
+  - 大小写：UnIoN SeLeCt
+  - 内联注释拆词：无法绕 MySQL 词法分析（a和nd是两个token）
+  - 浮点数绕过：1union select → 1.0union select（失败）
+- 空格绕过
+  - %a0 / %0b / %0d
+  - /**/ / +
+  - 括号：updatexml(1,(select(database())))
+- 注释符绕过
+  - 过滤 --+ → 用 '1'='1 自己闭合
+  - 过滤 # → 同上
+- WAF 绕过
+  - 数据溢出（超长文件名）
+  - 符号变异（引号/分号/反斜杠）
+  - 数据截断（%00 / %0a）
+  - 重复数据（HPP 多参数）
+  - 编码绕过（URL/双重/Unicode）
+  - 解析差异（WAF和后端取值不同）
+- 特殊绕过
+  - and/or 过滤 → && / ||
+  - select 过滤 → 混合大小写 SeLeCt
+  - union select 直接匹配 → 先删空格使规则失效
+
+## 防御
+- 代码层
+  - 参数化查询 / 预编译（最核心）
+  - 输入白名单校验
+  - 转义函数（仅防护当前这次拼接）
+- 配置层
+  - 最小权限（Web 用户只读）
+  - 禁用危险函数（xp\_cmdshell）
+  - 关闭错误回显
+- WAF 层
+  - 特征匹配
+  - 频率限制
+- 纵深防御
+  - 转义 ≠ 安全（二次注入教训）
+  - 黑名单永远有盲区
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.17"></script>
+</body>
+</html>
