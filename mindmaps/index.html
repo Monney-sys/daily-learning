@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>思维导图索引 — daily-learning</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0f0f1a; color: #ccc; font-family: -apple-system, sans-serif;
+    display: flex; align-items: center; justify-content: center; min-height: 100vh;
+  }
+  .card {
+    background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 12px;
+    padding: 40px 50px; max-width: 500px; width: 90%;
+  }
+  .card h1 { color: #fff; font-size: 22px; margin-bottom: 6px; }
+  .card p.sub { color: #888; font-size: 13px; margin-bottom: 28px; }
+  .card a {
+    display: block; padding: 14px 18px; margin-bottom: 10px;
+    background: #16213e; border: 1px solid #2a2a5a; border-radius: 8px;
+    color: #ddd; text-decoration: none; font-size: 15px;
+    transition: all 0.2s;
+  }
+  .card a:hover { background: #1f3060; border-color: #4a6aff; color: #fff; transform: translateX(4px); }
+  .card a .emoji { margin-right: 8px; font-size: 18px; }
+  .card a .date { float: right; color: #666; font-size: 12px; margin-top: 2px; }
+  .footer { margin-top: 24px; font-size: 12px; color: #555; text-align: center; }
+  .footer a { color: #666; display: inline; padding: 0; background: none; border: none; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>🧠 思维导图索引</h1>
+  <p class="sub">滚轮缩放 · 拖拽平移 · 彩色分区 · 点击「返回」回笔记</p>
+
+  <a href="文件包含漏洞.html">
+    <span class="emoji">📂</span> 文件包含漏洞
+    <span class="date">2026-08-05</span>
+  </a>
+
+  <a href="RCE远程代码命令执行.html">
+    <span class="emoji">💻</span> RCE 远程代码/命令执行
+    <span class="date">2026-08-05</span>
+  </a>
+
+  <div class="footer">
+    返回 <a href="../README.md">📖 daily-learning 笔记目录</a>
+  </div>
+</div>
+</body>
+</html>
