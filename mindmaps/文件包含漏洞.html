@@ -2,24 +2,15 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>文件包含漏洞</title>
-<style>
-* { margin: 0; padding: 0; }
-#mindmap { width: 100vw; height: 100vh; }
-</style>
+<style>* { margin: 0; padding: 0; } #m { width: 100vw; height: 100vh; }</style>
 </head>
 <body>
-<svg id="mindmap"></svg>
-<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="https://cdn.jsdelivr.net/npm/markmap-view"></script>
-<script src="https://cdn.jsdelivr.net/npm/markmap-lib"></script>
-<script>
-const { Markmap } = window.markmap;
+<div class="markmap" id="m">
 
-const markdown = `# 文件包含漏洞
+# 文件包含漏洞
 
-## 脚本/语言
+## 脚本 / 语言
 - PHP（主力）
 - JSP / ASPX
 - Python / JavaWeb
@@ -52,7 +43,7 @@ const markdown = `# 文件包含漏洞
   - 有限制（后缀 / 前缀）
 - 远程包含 RFI
   - 无限制
-  - 有限制（allow_url_include）
+  - 有限制（allow\_url\_include）
 - PHP 伪协议
   - php://filter（任意读 + filter 链 RCE）
   - data://
@@ -86,7 +77,7 @@ const markdown = `# 文件包含漏洞
 - 开发层
   - 固定后缀、白名单
   - 路径规范化（realpath / basename）
-  - allow_url_include=Off
+  - allow\_url\_include=Off
   - 限制 php:// 协议
 - 运行时
   - WAF / RASP
@@ -102,12 +93,8 @@ const markdown = `# 文件包含漏洞
   - 异常参数检测
   - 日志投毒痕迹审计
   - 蜜罐诱捕
-`;
 
-const { root } = Markmap.registry.markmap.parser.parse(markdown);
-root.children.forEach(c => c.payload = { fold: 0 });
-const mm = Markmap.create("#mindmap", null, root);
-mm.fit();
-</script>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.17"></script>
 </body>
 </html>

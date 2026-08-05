@@ -2,32 +2,23 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RCE 远程代码/命令执行</title>
-<style>
-* { margin: 0; padding: 0; }
-#mindmap { width: 100vw; height: 100vh; }
-</style>
+<style>* { margin: 0; padding: 0; } #m { width: 100vw; height: 100vh; }</style>
 </head>
 <body>
-<svg id="mindmap"></svg>
-<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="https://cdn.jsdelivr.net/npm/markmap-view"></script>
-<script src="https://cdn.jsdelivr.net/npm/markmap-lib"></script>
-<script>
-const { Markmap } = window.markmap;
+<div class="markmap" id="m">
 
-const markdown = `# RCE 远程代码/命令执行
+# RCE 远程代码/命令执行
 
 ## 命令执行 Command Injection
 - 原理
   - 用户输入拼入系统命令
   - 通过分隔符接上自己的命令
 - 拼接符号
-  - Linux：; | || && & \`\` $()
-  - Windows：& && || |
+  - Linux：; | \|\| && & \`\` \$()
+  - Windows：& && \|\| |
 - 危险函数
-  - PHP：system() exec() shell_exec() passthru() popen()
+  - PHP：system() exec() shell\_exec() passthru() popen()
   - Python：os.system() os.popen() subprocess
   - Java：Runtime.exec() ProcessBuilder
 - 存在位置
@@ -39,15 +30,15 @@ const markdown = `# RCE 远程代码/命令执行
 ## 代码执行 Code Injection
 - 原理：用户输入直接当代码执行
 - 危险函数
-  - PHP：eval() assert() preg_replace/e create_function()
-  - Python：eval() exec() __import__() pickle.loads()
+  - PHP：eval() assert() preg\_replace/e create\_function()
+  - Python：eval() exec() \_\_import\_\_() pickle.loads()
   - Java：OGNL / SpEL / MVEL / ScriptEngine
 - 存在位置
   - 模板引擎 SSTI（Smarty / Twig / FreeMarker）
-  - CMS 插件/主题编辑器
+  - CMS 插件 / 主题编辑器
   - 在线代码沙箱
   - 反序列化（unserialize / pickle）
-  - 数据库存储过程（xp_cmdshell）
+  - 数据库存储过程（xp\_cmdshell）
 
 ## 检测方法
 - 白盒
@@ -65,13 +56,13 @@ const markdown = `# RCE 远程代码/命令执行
 
 ## 绕过手法
 - 空格绕过
-  - IFS / IFS9 / %09 / < / <> / { }
+  - \$\{IFS\} / IFS9 / \%09 / &lt; / &lt;&gt; / \{\}
 - 关键词绕过
   - cat→more/less/head/tail/tac
-  - c\\at / /bin/c?t / ca''t
+  - c\\\\at / /bin/c?t / ca''t
 - 分隔符绕过
-  - ; → %0a 换行 / %0d%0a
-  - || / && / $()
+  - ; → \%0a 换行 / \%0d\%0a
+  - \|\| / && / \$()
 - 编码混淆
   - base64 / chr() / 拼接 / XOR
 
@@ -80,21 +71,17 @@ const markdown = `# RCE 远程代码/命令执行
   - 白名单映射 + escapeshellarg
   - 禁用 eval / assert
 - 配置层
-  - disable_functions
-  - open_basedir
+  - disable\_functions
+  - open\_basedir
 - 运行时
-  - 容器/沙箱隔离
+  - 容器 / 沙箱隔离
   - 最小权限 + seccomp / AppArmor
   - 网络隔离（限出口 IP）
 - 监控
   - 异常命令检测
   - 进程行为审计
-`;
 
-const { root } = Markmap.registry.markmap.parser.parse(markdown);
-root.children.forEach(c => c.payload = { fold: 0 });
-const mm = Markmap.create("#mindmap", null, root);
-mm.fit();
-</script>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.17"></script>
 </body>
 </html>
