@@ -1,136 +1,113 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>文件包含漏洞 — 知识框架</title>
+<title>文件包含漏洞</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #1a1a2e; font-family: -apple-system, sans-serif; }
-  .header {
-    text-align: center; padding: 20px; color: #fff; background: #16213e;
-    border-bottom: 2px solid #0f3460;
-  }
-  .header h1 { font-size: 24px; margin-bottom: 4px; }
-  .header p { font-size: 13px; color: #a0a0b8; }
-  .container { display: flex; height: calc(100vh - 75px); }
-  .mermaid {
-    flex: 1; padding: 20px; overflow: auto;
-    background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
-  }
-  .legend {
-    width: 220px; background: #16213e; color: #ccc; padding: 20px 16px;
-    font-size: 13px; line-height: 1.8; border-left: 2px solid #0f3460;
-    overflow-y: auto;
-  }
-  .legend h3 { color: #fff; margin-bottom: 12px; font-size: 15px; }
-  .legend .dot {
-    display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px;
-  }
-  .tips {
-    margin-top: 16px; padding: 10px; background: #0f3460; border-radius: 6px;
-    font-size: 12px; color: #b0b0c8;
-  }
+* { margin: 0; padding: 0; }
+#mindmap { width: 100vw; height: 100vh; }
 </style>
 </head>
 <body>
-<div class="header">
-  <h1>📂 文件包含漏洞 — 知识框架</h1>
-  <p>滚轮缩放 · 拖拽平移 · 点击节点跳转</p>
-</div>
-<div class="container">
-  <div class="mermaid">
-    <pre class="mermaid">
-flowchart TB
-    ROOT(("<b>文件包含漏洞</b>"))
-
-    ROOT --> SCRIPT
-    ROOT --> DETECT
-    ROOT --> TYPES
-    ROOT --> EXPLOIT
-    ROOT --> DEFENSE
-
-    subgraph SCRIPT["🖥️ 脚本 / 语言"]
-      direction LR
-      S1["PHP 主力"]:::blue
-      S2["JSP · ASPX"]:::blue
-      S3["Python · JavaWeb"]:::blue
-      S4["Node.js · Go · Spring"]:::blue
-      S5["Thymeleaf · FreeMarker · Nginx alias"]:::blue
-    end
-
-    subgraph DETECT["🔍 检测方法"]
-      direction TB
-      D1["白盒 — SAST / CodeQL / AI审计 / 代码审计"]:::green
-      D2["黑盒 — ffuf / wfuzz 模糊测试 / 手工"]:::green
-      D3["灰盒 — IAST 污点追踪 / 差分响应检测"]:::green
-      D4["供应链 — SCA 组件扫描 / CVE 匹配"]:::green
-    end
-
-    subgraph TYPES["📦 漏洞类型"]
-      direction TB
-      T1["LFI 本地包含 — 无限制 / 有限制"]:::orange
-      T2["RFI 远程包含 — allow_url_include"]:::orange
-      T3["PHP 伪协议 — filter: / phar:// / data:// / zip://"]:::orange
-      T4["特殊路径 — /proc / session / 日志 / 临时文件"]:::orange
-    end
-
-    subgraph EXPLOIT["⚔️ 利用链"]
-      direction TB
-      E1["源码泄露 → 二次审计 → RCE"]:::purple
-      E2["日志投毒 → RCE"]:::purple
-      E3["Phar 反序列化 → 对象注入"]:::purple
-      E4["图片马 / zip + LFI → RCE"]:::purple
-      E5["PHP filter 链 → 无文件 RCE"]:::purple
-      E6["LFI → SSRF → 云元数据 / K8s"]:::purple
-      E7[".env / SSH / .git 凭据泄露"]:::purple
-    end
-
-    subgraph DEFENSE["🛡️ 安全修复"]
-      direction TB
-      F1["开发 — 白名单 + realpath + allow_url_include=Off"]:::teal
-      F2["运行时 — WAF/RASP + 容器隔离 + 最小权限"]:::teal
-      F3["管理 — CI/CD SAST门禁 + IMDSv2"]:::teal
-      F4["监控 — 异常检测 + 日志投毒审计 + 蜜罐"]:::teal
-    end
-
-    style ROOT fill:#e74c3c,stroke:#c0392b,color:#fff,stroke-width:3px,rx:12
-    style SCRIPT fill:#1a3a5c,stroke:#2980b9,color:#d0e8ff
-    style DETECT fill:#1a3c2a,stroke:#27ae60,color:#d0ffe0
-    style TYPES fill:#3c2a1a,stroke:#e67e22,color:#ffe8d0
-    style EXPLOIT fill:#2a1a3c,stroke:#8e44ad,color:#e8d0ff
-    style DEFENSE fill:#1a3c3c,stroke:#16a085,color:#d0fff8
-    classDef blue fill:#2980b9,stroke:#1a5276,color:#fff
-    classDef green fill:#27ae60,stroke:#1a7a3a,color:#fff
-    classDef orange fill:#e67e22,stroke:#b0601a,color:#fff
-    classDef purple fill:#8e44ad,stroke:#6a2a8a,color:#fff
-    classDef teal fill:#16a085,stroke:#0e6b5c,color:#fff
-    </pre>
-  </div>
-  <div class="legend">
-    <h3>图例</h3>
-    <div><span class="dot" style="background:#e74c3c"></span> 中心主题</div>
-    <div><span class="dot" style="background:#2980b9"></span> 适用语言/框架</div>
-    <div><span class="dot" style="background:#27ae60"></span> 检测手段</div>
-    <div><span class="dot" style="background:#e67e22"></span> 漏洞类型</div>
-    <div><span class="dot" style="background:#8e44ad"></span> 攻击利用链</div>
-    <div><span class="dot" style="background:#16a085"></span> 防御方案</div>
-    <div class="tips">
-      💡 <b>提示</b><br>
-      滚轮缩放 · 拖拽平移<br>
-      点击「返回」回笔记
-    </div>
-  </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<svg id="mindmap"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-view"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-lib"></script>
 <script>
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'dark',
-    securityLevel: 'loose',
-    flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
-  });
+const { Markmap } = window.markmap;
+
+const markdown = `# 文件包含漏洞
+
+## 脚本/语言
+- PHP（主力）
+- JSP / ASPX
+- Python / JavaWeb
+- 现代框架形态
+  - Node.js 模板包含
+  - Go http.Dir
+  - Spring 资源读取
+  - Thymeleaf / FreeMarker
+  - Nginx alias 穿越
+
+## 检测
+- 白盒
+  - 代码审计
+  - SAST 工具（Semgrep / CodeQL）
+  - AI 辅助审计（LLM 污点链）
+- 黑盒
+  - 公开漏洞
+  - 手工看参数值及功能点
+  - 模糊测试（ffuf / wfuzz）
+- 灰盒 / IAST
+  - 运行时污点追踪
+  - 差分响应检测
+- 供应链维度
+  - SCA 组件扫描
+  - 已知 CVE 匹配
+
+## 类型
+- 本地包含 LFI
+  - 无限制
+  - 有限制（后缀 / 前缀）
+- 远程包含 RFI
+  - 无限制
+  - 有限制（allow_url_include）
+- PHP 伪协议
+  - php://filter（任意读 + filter 链 RCE）
+  - data://
+  - zip://
+  - phar://（触发反序列化）
+  - file:// / http:// / ftp://
+- 特殊路径包含
+  - /proc/self/environ
+  - /proc/self/fd/N
+  - session 文件
+  - 日志文件
+  - 临时上传文件
+
+## 利用
+- 经典组合拳
+  - LFI → 源码泄露 → 二次审计 RCE
+  - LFI + 日志投毒 → RCE
+  - LFI + Phar 反序列化
+  - LFI + 文件上传（图片马 / zip）
+  - LFI + PHP filter 链 → 无文件 RCE
+- 横向扩展
+  - LFI → SSRF → 云元数据 169.254.169.254
+  - K8s secrets / 容器环境变量
+  - 读取 .env / 配置文件 → 凭据泄露
+  - 读取 SSH 私钥 / .git
+- AI 时代利用
+  - LLM 自动生成 payload / filter 链
+  - 自动化漏洞链编排
+
+## 修复
+- 开发层
+  - 固定后缀、白名单
+  - 路径规范化（realpath / basename）
+  - allow_url_include=Off
+  - 限制 php:// 协议
+- 运行时
+  - WAF / RASP
+  - 容器/沙箱隔离
+  - 最小权限降权
+  - 敏感目录禁止包含
+- 管理面
+  - SCA / SAST 接入 CI/CD
+  - 组件版本治理
+  - IMDSv2 云元数据防护
+  - 密钥轮换
+- 监控
+  - 异常参数检测
+  - 日志投毒痕迹审计
+  - 蜜罐诱捕
+`;
+
+const { root } = Markmap.registry.markmap.parser.parse(markdown);
+root.children.forEach(c => c.payload = { fold: 0 });
+const mm = Markmap.create("#mindmap", null, root);
+mm.fit();
 </script>
 </body>
 </html>

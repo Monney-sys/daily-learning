@@ -1,132 +1,100 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RCE 远程代码/命令执行 — 知识框架</title>
+<title>RCE 远程代码/命令执行</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #1a1a2e; font-family: -apple-system, sans-serif; }
-  .header {
-    text-align: center; padding: 20px; color: #fff; background: #16213e;
-    border-bottom: 2px solid #0f3460;
-  }
-  .header h1 { font-size: 24px; margin-bottom: 4px; }
-  .header p { font-size: 13px; color: #a0a0b8; }
-  .container { display: flex; height: calc(100vh - 75px); }
-  .mermaid {
-    flex: 1; padding: 20px; overflow: auto;
-    background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
-  }
-  .legend {
-    width: 220px; background: #16213e; color: #ccc; padding: 20px 16px;
-    font-size: 13px; line-height: 1.8; border-left: 2px solid #0f3460;
-    overflow-y: auto;
-  }
-  .legend h3 { color: #fff; margin-bottom: 12px; font-size: 15px; }
-  .legend .dot {
-    display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px;
-  }
-  .tips {
-    margin-top: 16px; padding: 10px; background: #0f3460; border-radius: 6px;
-    font-size: 12px; color: #b0b0c8;
-  }
+* { margin: 0; padding: 0; }
+#mindmap { width: 100vw; height: 100vh; }
 </style>
 </head>
 <body>
-<div class="header">
-  <h1>💻 RCE 远程代码/命令执行 — 知识框架</h1>
-  <p>滚轮缩放 · 拖拽平移 · 点击节点跳转</p>
-</div>
-<div class="container">
-  <div class="mermaid">
-    <pre class="mermaid">
-flowchart TB
-    ROOT(("<b>RCE 远程代码/命令执行</b>"))
-
-    ROOT --> CMD
-    ROOT --> CODE
-    ROOT --> DETECT
-    ROOT --> BYPASS
-    ROOT --> DEFENSE
-
-    subgraph CMD["⌨️ 命令执行 Command Injection"]
-      direction LR
-      C1["原理：用户输入拼入系统命令<br/>通过分隔符接上自己的命令"]:::blue
-      C2["Linux 分隔符<br/>; | || && &amp;&amp; `` $()"]:::blue
-      C3["Windows 分隔符<br/>&amp; &amp;&amp; || |"]:::blue
-      C4["危险函数<br/>system() exec() shell_exec() popen()"]:::blue
-      C5["常见场景<br/>ping · traceroute · 备份 · 邮件 · 插件"]:::blue
-    end
-
-    subgraph CODE["💻 代码执行 Code Injection"]
-      direction LR
-      O1["原理：用户输入直接当代码执行<br/>eval() assert() 等"]:::purple
-      O2["PHP<br/>eval() assert() preg_replace/e create_function()"]:::purple
-      O3["Python / Java<br/>eval() exec() pickle OGNL SpEL MVEL"]:::purple
-      O4["常见场景<br/>SSTI · CMS编辑器 · 沙箱 · 反序列化 · xp_cmdshell"]:::purple
-    end
-
-    subgraph DETECT["🔍 检测方法"]
-      direction TB
-      D1["白盒 — 搜索危险函数 + 参数污点追踪 + Semgrep/CodeQL"]:::green
-      D2["命令执行 — sleep延时 / id回显 / DNSLog外带"]:::green
-      D3["代码执行 — 1+1数学运算 / phpinfo() / sleep(5)延时"]:::green
-    end
-
-    subgraph BYPASS["🔓 绕过手法"]
-      direction TB
-      B1["空格绕过 — IFS / %09 / &lt; / &lt;&gt; / {}"]:::orange
-      B2["关键词绕过 — cat→more tail tac / c\at / ca''t"]:::orange
-      B3["分隔符绕过 — ; → %0a换行 / || / &amp;&amp; / $()"]:::orange
-      B4["编码混淆 — base64 / chr() / 字符串拼接 / XOR"]:::orange
-    end
-
-    subgraph DEFENSE["🛡️ 安全修复"]
-      direction TB
-      F1["代码层 — 白名单 + escapeshellarg + 禁用eval/assert"]:::teal
-      F2["配置层 — disable_functions + open_basedir"]:::teal
-      F3["运行时 — 容器隔离 + 最小权限 + seccomp + 限出口IP"]:::teal
-      F4["监控 — 异常命令检测 + 进程行为审计"]:::teal
-    end
-
-    style ROOT fill:#e74c3c,stroke:#c0392b,color:#fff,stroke-width:3px,rx:12
-    style CMD fill:#1a3a5c,stroke:#2980b9,color:#d0e8ff
-    style CODE fill:#1a1a3c,stroke:#8e44ad,color:#e8d0ff
-    style DETECT fill:#1a3c2a,stroke:#27ae60,color:#d0ffe0
-    style BYPASS fill:#3c2a1a,stroke:#e67e22,color:#ffe8d0
-    style DEFENSE fill:#1a3c3c,stroke:#16a085,color:#d0fff8
-    classDef blue fill:#2980b9,stroke:#1a5276,color:#fff
-    classDef purple fill:#8e44ad,stroke:#6a2a8a,color:#fff
-    classDef green fill:#27ae60,stroke:#1a7a3a,color:#fff
-    classDef orange fill:#e67e22,stroke:#b0601a,color:#fff
-    classDef teal fill:#16a085,stroke:#0e6b5c,color:#fff
-    </pre>
-  </div>
-  <div class="legend">
-    <h3>图例</h3>
-    <div><span class="dot" style="background:#e74c3c"></span> 中心主题</div>
-    <div><span class="dot" style="background:#2980b9"></span> 命令执行</div>
-    <div><span class="dot" style="background:#8e44ad"></span> 代码执行</div>
-    <div><span class="dot" style="background:#27ae60"></span> 检测方法</div>
-    <div><span class="dot" style="background:#e67e22"></span> 绕过手法</div>
-    <div><span class="dot" style="background:#16a085"></span> 防御方案</div>
-    <div class="tips">
-      💡 <b>提示</b><br>
-      滚轮缩放 · 拖拽平移<br>
-      点击「返回」回笔记
-    </div>
-  </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<svg id="mindmap"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-view"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-lib"></script>
 <script>
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'dark',
-    securityLevel: 'loose',
-    flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
-  });
+const { Markmap } = window.markmap;
+
+const markdown = `# RCE 远程代码/命令执行
+
+## 命令执行 Command Injection
+- 原理
+  - 用户输入拼入系统命令
+  - 通过分隔符接上自己的命令
+- 拼接符号
+  - Linux：; | || && & \`\` $()
+  - Windows：& && || |
+- 危险函数
+  - PHP：system() exec() shell_exec() passthru() popen()
+  - Python：os.system() os.popen() subprocess
+  - Java：Runtime.exec() ProcessBuilder
+- 存在位置
+  - ping / traceroute / nslookup / whois
+  - 压缩解压 / 图片处理（ImageMagick）
+  - 邮件 sendmail / 备份 mysqldump / tar
+  - 插件：Apache Nifi、Webmin、CMS 后台
+
+## 代码执行 Code Injection
+- 原理：用户输入直接当代码执行
+- 危险函数
+  - PHP：eval() assert() preg_replace/e create_function()
+  - Python：eval() exec() __import__() pickle.loads()
+  - Java：OGNL / SpEL / MVEL / ScriptEngine
+- 存在位置
+  - 模板引擎 SSTI（Smarty / Twig / FreeMarker）
+  - CMS 插件/主题编辑器
+  - 在线代码沙箱
+  - 反序列化（unserialize / pickle）
+  - 数据库存储过程（xp_cmdshell）
+
+## 检测方法
+- 白盒
+  - 搜索危险函数
+  - 参数污点追踪
+  - Semgrep / CodeQL
+- 黑盒：命令执行
+  - 延时探测：;sleep+5
+  - 回显探测：;id / ;whoami
+  - 外带探测（无回显）：;curl dnslog.cn
+- 黑盒：代码执行
+  - 数学运算：print(1+1)
+  - 函数探测：phpinfo()
+  - 延时：sleep(5)
+
+## 绕过手法
+- 空格绕过
+  - IFS / IFS9 / %09 / < / <> / { }
+- 关键词绕过
+  - cat→more/less/head/tail/tac
+  - c\\at / /bin/c?t / ca''t
+- 分隔符绕过
+  - ; → %0a 换行 / %0d%0a
+  - || / && / $()
+- 编码混淆
+  - base64 / chr() / 拼接 / XOR
+
+## 安全修复
+- 代码层
+  - 白名单映射 + escapeshellarg
+  - 禁用 eval / assert
+- 配置层
+  - disable_functions
+  - open_basedir
+- 运行时
+  - 容器/沙箱隔离
+  - 最小权限 + seccomp / AppArmor
+  - 网络隔离（限出口 IP）
+- 监控
+  - 异常命令检测
+  - 进程行为审计
+`;
+
+const { root } = Markmap.registry.markmap.parser.parse(markdown);
+root.children.forEach(c => c.payload = { fold: 0 });
+const mm = Markmap.create("#mindmap", null, root);
+mm.fit();
 </script>
 </body>
 </html>
