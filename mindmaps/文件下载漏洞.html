@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>文件下载漏洞</title>
+<style>
+* { margin: 0; padding: 0; }
+#m { width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; }
+#m svg { width: 100% !important; height: 100% !important; }
+</style>
+</head>
+<body>
+<div class="markmap" id="m">
+
+# 文件下载漏洞
+
+## 原理
+- 路径拼接不当（用户输入直接拼入路径）
+- 未做白名单校验
+- 未做路径规范化（realpath）
+- 一句话：信任了用户提供的路径参数
+
+## 攻击手法
+- 路径穿越
+  - `../../../etc/passwd`
+  - Windows 也适用（`..\\..\\`）
+- 绝对路径直接指定
+  - `/etc/shadow`
+- 编码绕过
+  - URL 编码（`..%2F` / `%2e%2e%2f`）
+  - 二次编码（`..%252F`）
+- 双写绕过
+  - `....//....//etc/passwd`（防御只删一次 ../ 时绕过）
+- 截断绕过（老版本 PHP）
+  - %00 截断（`file.php%00.jpg`）
+  - 路径长度截断（4096 字符溢出）
+
+## 检测方法
+- 白盒
+  - 搜索文件读取函数（fopen / readfile / file\_get\_contents / send\_file）
+  - 追踪用户输入到文件路径的污点链
+- 黑盒
+  - 参数名特征：file= / path= / download= / read= / name=
+  - URL 路径特征：/download/xxx / /static/xxx
+  - 模糊测试：dirsearch / ffuf / Burp Intruder
+- 通用 PoC
+  - Linux：`../../../../etc/passwd`
+  - Windows：`..\\..\\..\\windows\\win.ini`
+
+## 利用场景
+- 读取配置文件
+  - .env / config.php / web.config → 数据库密码、API Key
+  - /etc/config/account → IoT 设备明文凭据
+- 读取源码
+  - 下载 .php/.java/.py 源码 → 白盒审计找更多漏洞
+- 读取系统文件
+  - Linux：/etc/shadow / /root/.ssh/id\_rsa
+  - Windows：C:\\Windows\\System32\\config\\SAM
+- 读取日志文件
+  - access.log / error.log → 从中找 session、token
+- 经典组合链
+  - 文件下载 + 配置凭据 → 登录后台（小米路由器案例）
+  - 文件下载 + 源码泄露 → 二次审计 → RCE
+  - 文件下载 + SSH 私钥 → 直接登录服务器
+
+## 广义视角：任意文件读取
+- 文件下载漏洞是"任意文件读取"的一种
+- 其他能读文件的漏洞
+  - LFI 文件包含（include 函数读文件 + 可能 RCE）
+  - XXE 外部实体注入（file:// 协议读文件）
+  - SSRF 服务端请求伪造（file:// 协议读本地文件）
+  - SSTI 模板注入（模板里调用文件读取函数）
+- 区分要点
+  - 文件下载：浏览器弹下载框，文件内容不直接回显
+  - 文件读取：内容直接在页面/响应体中回显
+
+## 防御方案
+- 开发层（根本）
+  - 白名单：只允许下载指定文件（ID 映射，不暴露真实路径）
+  - realpath + startswith 校验：确保解析后路径在允许目录内
+  - 禁用用户提供的路径参数，改用文件 ID 查询
+- 运行时
+  - WAF 规则：拦截 ../ 及编码变体
+  - 敏感目录权限最小化（Web 用户不可读 /etc/shadow）
+- 管理面
+  - 配置文件不存明文密码
+  - 密钥轮换 + 最小权限原则
+  - CI/CD 接入 SAST 扫描
+
+## 实战靶场
+- Upload Labs（部分关卡的下载接口）
+- Pikachu（任意文件下载模块）
+- DVWA（File Inclusion 可类比）
+- Vulhub 相关 CVE 复现
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.17"></script>
+</body>
+</html>
