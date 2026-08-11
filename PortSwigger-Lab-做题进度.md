@@ -24,7 +24,7 @@
 
 ---
 
-## Authentication（认证缺陷）— 已完成 4/14（2026-08-11 开始）
+## Authentication（认证缺陷）— 已完成 5/14（2026-08-11 开始）
 
 | # | Lab | 核心考点 | 攻击手法 |
 |---|-----|---------|---------|
@@ -32,6 +32,7 @@
 | 2 | 2FA simple bypass | 2FA 流程绕过 | 登录后直接访问受保护页面，跳过 2FA 验证步骤 |
 | 3 | Password reset broken logic | 密码重置逻辑缺陷 | 重置流程中修改 username 参数指向目标账号，token 未绑定原账号 |
 | 4 | Username enumeration via subtly different responses | 用户名枚举（细微差异） | 响应几乎相同，但个别字符/长度/状态码有细微差别 → 对比响应体找差异 |
+| 5 | Username enumeration via response timing | 用户名枚举（响应时间差）+ 爆破保护绕过 | `X-Forwarded-For` 伪造 IP 绕过次数限制；超长密码放大时间差，按响应时间找有效用户名，再爆破密码（今天新做） |
 
 ---
 
@@ -76,12 +77,46 @@
   □ 表单 → 有没有隐藏的敏感字段
 ```
 
+### 响应时间差枚举用户名 + IP 封锁绕过（Authentication Lab 5）
+
+这一关的核心：登录接口有**基于 IP 的失败次数限制**，同一个 IP 试错太多次会被封锁，直接爆破不行。
+
+#### 两个绕过点
+
+**1. `X-Forwarded-For` 伪造 IP**
+
+服务器用 `X-Forwarded-For` 头判断客户端 IP（常见于反代场景），但没校验这个头能不能改。每次请求换一个 IP 值，次数限制就形同虚设：
+
+```
+POST /login HTTP/1.1
+Host: xxx
+X-Forwarded-For: 192.168.1.<每次请求换>
+
+username=carlos&password=xxx
+```
+
+**2. 响应时间差枚举用户名**
+
+登录逻辑里：用户名不存在 → 直接返回"用户名或密码错误"（快）；用户名存在 → 还要对密码做 bcrypt 哈希对比（慢）。两个响应差了几十上百毫秒，把候选用户名挨个试一遍，响应明显变慢的那个就是有效用户名。
+
+**关键坑（我卡了很久的原因）**：密码不能太短。密码越长，哈希计算耗时越久，时间差才明显；我用普通长度密码试，时间差淹没在网络抖动里根本分不出来。后来把密码设成 200 个 `A` 的超长串，时间差立刻肉眼可见。
+
+#### 完整流程
+
+```
+1. 枚举用户名：username=候选词 & password=超长串（200 个 A），X-Forwarded-For 每次换
+   → 按响应时间排序，最慢的那个就是有效用户名
+2. 爆破密码：username=刚枚举出来的用户 & password=密码字典，X-Forwarded-For 每次换
+   → 状态码 302 重定向 = 登录成功
+```
+
+注意 Intruder 里 `X-Forwarded-For` 也要设成 payload 一起遍历，否则试几十次就被 IP 封锁。
+
 ---
 
 ## 下一阶段
 
-Access Control 已全部完成 ✅，Authentication 进行中（4/14），剩余：
-- Username enumeration via response timing（响应时间差异枚举）
+Access Control 已全部完成 ✅，Authentication 进行中（5/14），剩余：
 - Broken brute-force protection, IP block（IP 封锁绕过）
 - Username enumeration via account lock（账户锁定枚举）
 - 2FA broken logic / 2FA bypass using a brute-force attack（2FA 逻辑缺陷/爆破）
