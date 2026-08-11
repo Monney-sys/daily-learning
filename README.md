@@ -82,6 +82,7 @@
 |------|------|
 | **PHP 反序列化入门** — 序列化格式/访问控制修饰符/魔术方法详解(10+种)/CTF真题拆解(弱类型绕过+null byte过滤)/POP链概念/通用攻击流程 | [2026-08-10-PHP反序列化入门.md](./2026-08-10-PHP反序列化入门.md) |
 | **Java 反序列化入门** — 序列化格式(魔数AC ED 00 05/rO0AB)/readObject原理/与PHP对比/Gadget Chain概念/ysoserial工具/URLDNS探测/Shiro-Fastjson-Weblogic场景/防御(ObjectInputFilter) | [2026-08-11-Java反序列化入门.md](./2026-08-11-Java反序列化入门.md) |
+| **Java 反序列化实战(WebGoat)** — 手动构造payload(serialVersionUID匹配/时间戳置null)/类型检查绕过/Java序列化格式手撕/依赖选链决策树/Shiro AES加密流程/Windows base64踩坑 | [2026-08-11-Java反序列化实战-WebGoat与选链.md](./2026-08-11-Java反序列化实战-WebGoat与选链.md) |
 
 ### XXE / XML 外部实体
 | 主题 | 文件 |
@@ -117,6 +118,7 @@
 | **2026-08-09** | **登录脆弱与认证缺陷 + 支付篡改与业务逻辑漏洞 + 找回与重置机制的逻辑越权 — 爆破/验证码绕过/Cookie篡改 + 购买全流程攻击面/条件竞争 + 六大攻击分类/身份绑定缺陷** |
 | **2026-08-10** | **验证码安全与绕过 + Token安全与防护绕过 + PHP反序列化入门 — 全生命周期漏洞/OCR/短信轰炸 + CSRF Token/JWT算法混淆/密钥爆破 + 序列化格式/魔术方法/CTF真题拆解** |
 | **2026-08-11** | **Java 反序列化入门 + XXE 与 XML 外部实体注入 — Gadget Chain/ysoserial/URLDNS探测 + 外部实体/盲XXE(OOB)/Billion Laughs/防御配置** |
+| **2026-08-11(续)** | **Java 反序列化实战 — WebGoat手动构造payload/serialVersionUID/时间戳绕过/依赖选链/Shiro加密/Windows踩坑** |
 
 ---
 
