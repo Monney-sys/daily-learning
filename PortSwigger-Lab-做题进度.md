@@ -24,7 +24,7 @@
 
 ---
 
-## Authentication（认证缺陷）— 已完成 5/14（2026-08-11 开始）
+## Authentication（认证缺陷）— 已完成 6/14（2026-08-11 开始）
 
 | # | Lab | 核心考点 | 攻击手法 |
 |---|-----|---------|---------|
@@ -33,6 +33,7 @@
 | 3 | Password reset broken logic | 密码重置逻辑缺陷 | 重置流程中修改 username 参数指向目标账号，token 未绑定原账号 |
 | 4 | Username enumeration via subtly different responses | 用户名枚举（细微差异） | 响应几乎相同，但个别字符/长度/状态码有细微差别 → 对比响应体找差异 |
 | 5 | Username enumeration via response timing | 用户名枚举（响应时间差）+ 爆破保护绕过 | `X-Forwarded-For` 伪造 IP 绕过次数限制；超长密码放大时间差，按响应时间找有效用户名，再爆破密码（今天新做） |
+| 6 | Broken brute-force protection, IP block | IP 封锁绕过（成功登录重置计数） | 连错 3 次封 IP，XFF 伪造无效 → 爆破与正确登录（wiener:peter）交替发送，成功登录把失败计数刷回 0（今天新做） |
 
 ---
 
@@ -112,12 +113,27 @@ username=carlos&password=xxx
 
 注意 Intruder 里 `X-Forwarded-For` 也要设成 payload 一起遍历，否则试几十次就被 IP 封锁。
 
+### IP 封锁绕过：成功登录重置计数（Authentication Lab 6）
+
+这一关的机制和 Lab 5 正好相反：
+
+- **封禁机制**：同一 IP 连续错误 3 次 → 封 IP，提示 too many incorrect login attempts
+- **XFF 无效**：上一关的 `X-Forwarded-For` 伪造 IP 在这关不好使，服务端把这条路堵了
+- **突破口**：一次**成功的登录会把失败计数刷新归零**
+
+所以打法就是：**正确登录和爆破交替着来** —— 爆一个候选密码，再用已知账号 `wiener:peter` 成功登录一次把计数刷回 0，再爆下一个，循环。计数永远到不了 3，封禁永远不触发。
+
+字典形态就是之前那个变形：每个候选密码下面插一行 `peter`（`passwords-peter.txt`），peter 行配 wiener 用户名，候选密码行配目标用户名。
+
+类比：门禁系统按错 3 次密码会报警，但按对一次计数就清零——那每次都"错一次、对一次"交替着来，报警永远不触发。
+
+> 换个角度看：这种"业务规则本身有豁免路径"的防护，比"纯 IP 计数"更容易被绕——防御时要考虑：成功登录是否应该重置**所有 IP** 的计数？重置粒度越粗，越容易被当跳板。
+
 ---
 
 ## 下一阶段
 
-Access Control 已全部完成 ✅，Authentication 进行中（5/14），剩余：
-- Broken brute-force protection, IP block（IP 封锁绕过）
+Access Control 已全部完成 ✅，Authentication 进行中（6/14），剩余：
 - Username enumeration via account lock（账户锁定枚举）
 - 2FA broken logic / 2FA bypass using a brute-force attack（2FA 逻辑缺陷/爆破）
 - Brute-forcing a stay-logged-in cookie（remember-me Cookie 爆破）
