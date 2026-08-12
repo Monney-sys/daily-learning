@@ -1,4 +1,4 @@
-# PortSwigger Lab 做题进度
+﻿# PortSwigger Lab 做题进度
 
 > 靶场：https://portswigger.net/web-security
 
@@ -24,7 +24,7 @@
 
 ---
 
-## Authentication（认证缺陷）— 已完成 6/14（2026-08-11 开始）
+## Authentication（认证缺陷）— 已完成 7/14（2026-08-11 开始）
 
 | # | Lab | 核心考点 | 攻击手法 |
 |---|-----|---------|---------|
@@ -34,6 +34,7 @@
 | 4 | Username enumeration via subtly different responses | 用户名枚举（细微差异） | 响应几乎相同，但个别字符/长度/状态码有细微差别 → 对比响应体找差异 |
 | 5 | Username enumeration via response timing | 用户名枚举（响应时间差）+ 爆破保护绕过 | `X-Forwarded-For` 伪造 IP 绕过次数限制；超长密码放大时间差，按响应时间找有效用户名，再爆破密码（今天新做） |
 | 6 | Broken brute-force protection, IP block | IP 封锁绕过（成功登录重置计数） | 连错 3 次封 IP，XFF 伪造无效 → 爆破与正确登录（wiener:peter）交替发送，成功登录把失败计数刷回 0（今天新做） |
+| 7 | Username enumeration via account lock | 账户锁定枚举（防护机制当信号） | 有效账号连错 3 次触发锁定提示 → 用锁定提示枚举用户名；爆破密码时 grep extract 标记报错文案，正确密码的响应无报错即命中（今天新做） |
 
 ---
 
@@ -129,12 +130,31 @@ username=carlos&password=xxx
 
 > 换个角度看：这种"业务规则本身有豁免路径"的防护，比"纯 IP 计数"更容易被绕——防御时要考虑：成功登录是否应该重置**所有 IP** 的计数？重置粒度越粗，越容易被当跳板。
 
+### 账户锁定枚举：防护机制本身就是信号（Authentication Lab 7）
+
+这一关的机制：**有效账号连错 3 次就会触发锁定**，提示 `You have made too many incorrect login attempts. Please try again in 1 minute(s).`；无效账号永远只返回 `Invalid username or password`，怎么错都不会锁定。
+
+所以"锁定"这个**防护机制本身**就成了枚举信号：
+
+```
+1. 枚举用户名：每个候选用户名连错 3 次以上
+   → 出现锁定提示的那个就是有效账号（防护机制把账号存在性泄露了）
+2. 爆破密码：Intruder 里 grep extract 标记报错文案
+   → 正确密码的响应里没有报错信息（登录成功直接跳转）
+   → 反向匹配：没有报错文案的那条响应 = 密码命中，不用专门绕封锁
+```
+
+我学到最关键的一点：**已知的机制（哪怕是防护）都能反过来当攻击入口**。锁定提示把"账号存不存在"泄露了出来；grep extract 标记报错文案 + 反向匹配，密码一步到位。
+
+类比：门禁错 3 次就锁门——但这等于在门口贴告示"这个账号真实存在"，反而帮攻击者确认目标。
+
+> 防御视角：错误文案必须统一（不管账号存在与否、是否锁定都返回同一句话）；锁定机制要防枚举（IP+账号组合计数），别让锁定提示变成账号存在性 oracle。
+
 ---
 
 ## 下一阶段
 
-Access Control 已全部完成 ✅，Authentication 进行中（6/14），剩余：
-- Username enumeration via account lock（账户锁定枚举）
+Access Control 已全部完成 ✅，Authentication 进行中（7/14），剩余：
 - 2FA broken logic / 2FA bypass using a brute-force attack（2FA 逻辑缺陷/爆破）
 - Brute-forcing a stay-logged-in cookie（remember-me Cookie 爆破）
 - Offline password cracking（离线密码破解）
