@@ -1,5 +1,7 @@
 # 2026-08-13 PortSwigger 认证机制绕过实战（Authentication 7/14 → 11/14）
 
+> 状态：✅ 实操过（4 关全过，2026-08-13）
+
 > 零碎 lab 笔记精简版：题目 / 要点 / 踩坑点。进度明细在 `PortSwigger-Lab-做题进度.md`。
 
 ## Lab 1: 2FA bypass using a broken logic（2FA 逻辑缺陷）

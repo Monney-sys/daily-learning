@@ -2,6 +2,8 @@
 
 记录每天的学习内容与收获，持续积累，持续成长。
 
+> 📋 开放问题台账：[OPEN-QUESTIONS.md](./OPEN-QUESTIONS.md) · 📊 靶场进度：[PortSwigger-Lab-做题进度.md](./PortSwigger-Lab-做题进度.md)
+
 ---
 
 ## 笔记目录（按主题）
