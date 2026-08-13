@@ -24,7 +24,7 @@
 
 ---
 
-## Authentication（认证缺陷）— 已完成 10/14（2026-08-11 开始，2026-08-13 更新）
+## Authentication（认证缺陷）— 已完成 11/14（2026-08-11 开始，2026-08-13 更新）
 
 | # | Lab | 核心考点 | 攻击手法 |
 |---|-----|---------|---------|
@@ -38,6 +38,7 @@
 | 8 | 2FA bypass using a broken logic | 2FA 逻辑缺陷（verify 参数可控）+ 验证码爆破 | GET /login2 改 verify=carlos 触发目标验证码 → 爆破 4 位 mfa-code → 302 命中（Burp CE 限速，Python 并发替代） |
 | 9 | Brute-forcing a stay-logged-in cookie | remember-me cookie 存密码哈希（可伪造） | cookie=base64(用户名:md5(密码)) → 预生成伪造 cookie 列表爆破 → 删掉 session cookie 只留 stay-logged-in → 200 命中即登录（官方用 Payload processing 动态转换） |
 | 10 | Offline password cracking | 密码哈希进 cookie + 存储型 XSS 组合 | 评论区 XSS 偷 carlos 的 stay-logged-in cookie → 解码拿 MD5 → 离线破解（hashcat）→ 明文登录删账户 |
+| 11 | Password reset poisoning via middleware | 密码重置投毒（重置链接域名可控） | 重置请求加 X-Forwarded-Host: 自己的 exploit server → 邮件链接指向攻击者 → carlos 点击 → token 进日志 → 拿自己合法链接换 token 改密 → 登录 |
 
 ---
 
@@ -171,13 +172,18 @@ username=carlos&password=xxx
 
 认知：偷到的 remember-me cookie 本身就能登录（会话接管）；破解出明文是"长期资产"（密码复用/横向移动）。MD5 无盐 = 明文等价物；正确实现是随机 token + 服务端存储。
 
+### 密码重置投毒：X-Forwarded-Host 控制重置链接（Authentication Lab 11）
+
+重置密码的邮件链接里 token 是安全的（随机、绑定目标用户），但**链接域名**由 `X-Forwarded-Host` 头拼接且未校验 → 加 `X-Forwarded-Host: exploit-server` 再给 carlos 发重置请求，carlos 点击邮件链接 → token 出现在 exploit server 日志（`/forgot-password?temp-forgot-password-token=xxx`）→ 拿自己 wiener 的合法重置链接换掉 token 参数 → 打开重置页给 carlos 设新密码 → 登录过关。
+
+认知：这是 Host header 注入的经典场景（密码重置投毒），真实世界常见于反代/中间件后面用 `X-Forwarded-Host`/`Forwarded` 生成绝对 URL 的应用；防御 = 生成链接用白名单域名，不信任任何客户端可控头。
+
 ---
 
 ## 下一阶段
 
-Access Control 已全部完成 ✅，Authentication 进行中（10/14），剩余：
+Access Control 已全部完成 ✅，Authentication 进行中（11/14），剩余：
 - 2FA bypass using a brute-force attack（2FA 爆破）
-- Password reset poisoning via middleware（中间件密码重置投毒）
 - Password brute-force via password change（改密接口爆破）
 - Broken brute-force protection, multiple credentials per request（单请求多凭据）
 

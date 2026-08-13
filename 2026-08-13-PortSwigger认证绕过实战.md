@@ -1,6 +1,6 @@
-# 2026-08-13 PortSwigger 认证机制绕过实战（2FA 逻辑缺陷 / stay-logged-in Cookie 爆破 / 离线破解）
+# 2026-08-13 PortSwigger 认证机制绕过实战（2FA 逻辑缺陷 / stay-logged-in Cookie 爆破 / 离线破解 / 密码重置投毒）
 
-> 今天把 Authentication 系列连打三关：**2FA broken logic → Brute-forcing a stay-logged-in cookie → Offline password cracking**。三关正好是认证体系的三个层面：第二道门（2FA）、持久化凭据（remember-me）、凭据还原（离线破解）。配合 08-09《登录脆弱与认证缺陷》食用，认证这块的攻击面就基本齐了。
+> 今天把 Authentication 系列连打四关：**2FA broken logic → Brute-forcing a stay-logged-in cookie → Offline password cracking → Password reset poisoning via middleware**。四关正好覆盖认证体系的四个层面：第二道门（2FA）、持久化凭据（remember-me）、凭据还原（离线破解）、重置流程的链接构造（Host 头投毒）。配合 08-09《登录脆弱与认证缺陷》食用，认证这块的攻击面就基本齐了。
 
 ---
 
@@ -15,6 +15,7 @@
 | 2FA broken logic | 逻辑缺陷 | 服务端用客户端传的 `verify` 参数决定"验证谁的码"，还让码可爆破 |
 | Brute-forcing stay-logged-in | 设计缺陷 | remember-me cookie 里直接塞 `base64(用户名:md5(密码))`，可读可伪造 |
 | Offline password cracking | 组合缺陷 | cookie 存密码哈希（设计缺陷）+ 评论区 XSS（泄露入口）→ 哈希离线秒破 |
+| Password reset poisoning | 信任链缺陷 | 邮件重置链接的域名用不可信头（X-Forwarded-Host）拼接，token 被引到攻击者手里 |
 
 ### 1.2 关键认知：三类凭据的信任边界
 
@@ -33,6 +34,7 @@ remember-me cookie → 客户端保存、服务端验，结构可读可伪造 �
 1. **verify 参数客户端可控（Lab 8）**：登录后 2FA 流程里，服务端靠请求里的 `verify=wiener` 决定"当前在验证谁的码"。这个参数是客户端传的、没和会话强绑定 → 改成 `verify=carlos`，服务端就去生成/校验 carlos 的码。加上验证码接口无限流 → 四位码 10000 次可爆。
 2. **remember-me cookie 存密码哈希（Lab 9、10）**：`stay-logged-in = base64(用户名:md5(密码))`。MD5 无盐且极快 → cookie 一旦泄露 = 密码哈希泄露 = 明文密码可离线还原；结构公开 → 不用偷也能伪造。
 3. **XSS 是泄露入口（Lab 10）**：评论区输出没编码，注入 `<script>` 后受害者一浏览，浏览器主动把他的 cookie 送到攻击者服务器。XSS 在这里不是终点，是"搬运工"。
+4. **重置链接域名可控（Lab 11）**：应用用 `X-Forwarded-Host` 头拼接邮件里的绝对 URL（中间件透传、应用未校验）→ 重置链接被引到攻击者域名，token 随受害者点击而泄露。token 本身安全，漏洞在"链接怎么拼"。
 
 ---
 
@@ -80,7 +82,24 @@ remember-me cookie → 客户端保存、服务端验，结构可读可伪造 �
 
 **我的思路 vs 官方路线**：我原计划偷到 cookie 直接用来登录（cookie 本身是有效凭证，不需要密码）；官方路线要求破解出明文密码再登录。两条都通，区别在目标：**cookie 直用 = 一次性会话接管；破解密码 = 长期资产**（密码会被复用、可横向移动）。lab 逼你走破解路线就是为了练 offline cracking 这步。
 
-### 3.4 方法论沉淀（比过关更值钱）
+### 3.4 Lab 11：Password reset poisoning via middleware（X-Forwarded-Host 投毒重置链接）
+
+```
+1. 重置密码功能：POST /forgot-password 会发一封带唯一 token 链接的邮件
+2. 请求加 X-Forwarded-Host: 自己的 exploit-server 域名 → 邮件里的重置链接指向攻击者
+3. username 改成 carlos 发送 → carlos 点击链接（lab 自动触发）
+4. exploit server 的 Access log 出现 GET /forgot-password?temp-forgot-password-token=xxx
+5. 拿自己 wiener 的合法重置链接（邮件里指向 lab 域名的那个），
+   把 temp-forgot-password-token 换成偷来的 token → 打开 → 给 carlos 设新密码
+6. 用新密码登录 carlos → 过关
+```
+
+**关键认知**：
+- **token 本身是安全的**（随机、绑定 carlos 的重置动作），漏洞在**链接域名由不可信头构造**——这是 Host header 注入的经典场景（密码重置投毒），真实世界常见于反代/中间件后面用 `X-Forwarded-Host`/`Forwarded` 生成绝对 URL 的应用
+- 这关的邮件客户端挂在 exploit server 上，接收点天然就位
+- 拿到 token 后访问重置页，`temp-forgot-password-token` 参数直接换成偷来的值即可，不需要知道 carlos 的原密码
+
+### 3.5 方法论沉淀（比过关更值钱）
 
 1. **先验证后攻击**：爆破/伪造攻击前，先用自己的已知凭据端到端跑通一次（伪造 wiener 的 cookie 验证 == 服务器发的真 cookie），确认攻击链和判定信号没问题，再打目标
 2. **用业务特征判命中**：找"只有登录成功才出现"的元素（按钮/用户名/文案）做 grep-match，别只看状态码——状态码会骗人（200 也可能渲染错误页）
@@ -137,10 +156,11 @@ remember-me cookie → 客户端保存、服务端验，结构可读可伪造 �
 - [JWT 安全与攻击](./2026-08-12-JWT安全与攻击.md) — 同是"客户端凭据 + 服务端验"，信任边界错位的同款教训
 - [XSS 跨站脚本攻击入门](./2026-08-02-XSS跨站脚本攻击入门.md) — 存储型 XSS 偷 cookie 的原理地基
 - [验证码安全与绕过技术](./2026-08-10-验证码安全与绕过技术.md) — 验证码全生命周期漏洞，今天 2FA 爆破是它的实战版
+- [找回与重置机制的逻辑越权](./2026-08-09-找回与重置机制的逻辑越权.md) — 重置流程攻击面系统梳理，今天是 Host 头投毒的实战版
 
 ## 待实践
 
-- [ ] Authentication 剩余 4 关：2FA bypass using a brute-force attack / Password reset poisoning via middleware / Password brute-force via password change / Broken brute-force protection, multiple credentials per request
+- [ ] Authentication 剩余 3 关：2FA bypass using a brute-force attack / Password brute-force via password change / Broken brute-force protection, multiple credentials per request
 - [ ] 用 hashcat 规则（`-r`）对已知 hash 做变形攻击
 - [ ] Turbo Intruder 学一下（Python 脚本化爆破，比 Intruder 灵活）
 - [ ] 找 Spring Security RememberMe 源码，对照"随机 token + 服务端存储"的正确实现
