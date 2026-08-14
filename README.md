@@ -3,6 +3,7 @@
 记录每天的学习内容与收获，持续积累，持续成长。
 
 > 📋 开放问题台账：[OPEN-QUESTIONS.md](./OPEN-QUESTIONS.md) · 📊 靶场进度：[PortSwigger-Lab-做题进度.md](./PortSwigger-Lab-做题进度.md)
+> 📝 做题笔记 writeup 模板：[`_templates/做题笔记-writeup模板.md`](./_templates/做题笔记-writeup模板.md)（题目→思路→过程→命中识别→踩坑→结果）
 
 ---
 
