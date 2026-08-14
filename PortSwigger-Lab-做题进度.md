@@ -26,9 +26,9 @@
 
 ---
 
-## Authentication（认证缺陷）— 已完成 11/14（2026-08-11 开始，2026-08-13 更新）
+## Authentication（认证缺陷）— 已完成 12/14（2026-08-11 开始，2026-08-14 更新）
 
-> 关联笔记：[登录脆弱与认证缺陷](./2026-08-09-登录脆弱与认证缺陷.md)（总览）、[PortSwigger认证绕过实战](./2026-08-13-PortSwigger认证绕过实战.md)（Lab 8-11 实战）
+> 关联笔记：[登录脆弱与认证缺陷](./2026-08-09-登录脆弱与认证缺陷.md)（总览）、[PortSwigger认证绕过实战](./2026-08-13-PortSwigger认证绕过实战.md)（Lab 8-11 实战）、[改密爆破与单请求多凭据](./2026-08-14-改密接口爆破与单请求多凭据.md)（Lab 12-13）
 
 | # | Lab | 核心考点 | 攻击手法 |
 |---|-----|---------|---------|
@@ -43,6 +43,8 @@
 | 9 | Brute-forcing a stay-logged-in cookie | remember-me cookie 存密码哈希（可伪造） | cookie=base64(用户名:md5(密码)) → 预生成伪造 cookie 列表爆破 → 删掉 session cookie 只留 stay-logged-in → 200 命中即登录（官方用 Payload processing 动态转换） |
 | 10 | Offline password cracking | 密码哈希进 cookie + 存储型 XSS 组合 | 评论区 XSS 偷 carlos 的 stay-logged-in cookie → 解码拿 MD5 → 离线破解（hashcat）→ 明文登录删账户 |
 | 11 | Password reset poisoning via middleware | 密码重置投毒（重置链接域名可控） | 重置请求加 X-Forwarded-Host: 自己的 exploit server → 邮件链接指向攻击者 → carlos 点击 → token 进日志 → 拿自己合法链接换 token 改密 → 登录 |
+| 12 | Password brute-force via password change | 改密接口爆破（锁定逻辑缺陷） | 两次新密码填不一致 → 错误当前密码不触发锁定可无限爆破；响应含 New passwords do not match 即密码正确（隐藏 username 字段改成 carlos）（今天新做） |
+| 13 | Broken brute-force protection, multiple credentials per request | 单请求多凭据（计数粒度缺陷，EXPERT） | JSON 登录 body 的 password 改数组塞全部候选密码 → 一次请求试完 → 302 命中（思路已通，待实操） |
 
 ---
 
@@ -182,12 +184,19 @@ username=carlos&password=xxx
 
 认知：这是 Host header 注入的经典场景（密码重置投毒），真实世界常见于反代/中间件后面用 `X-Forwarded-Host`/`Forwarded` 生成绝对 URL 的应用；防御 = 生成链接用白名单域名，不信任任何客户端可控头。
 
+### 改密接口爆破：新密码不一致绕过锁定（Authentication Lab 12）
+
+改密接口里"当前密码错误"的锁定条件**绑定了两次新密码是否一致**：一致才锁，不一致只报错。故意把两个新密码填成不同值 → 错误当前密码永远不触发锁定；且当前密码正确时返回的文案不同（`New passwords do not match`），直接当命中信号。隐藏字段 `username` 可改成目标用户。缺陷代码还原见 [2026-08-14 改密爆破与单请求多凭据](./2026-08-14-改密接口爆破与单请求多凭据.md)。
+
+### 单请求多凭据：JSON 数组压缩爆破（Authentication Lab 13 EXPERT）
+
+登录接口 JSON 的 `password` 字段类型未校验，服务端把它当"凭据集合"遍历：传数组 = 一次请求带整本字典。**防护按"请求"计数（错 100 个只算 1 次失败），业务按"元素"处理（逐个验证）→ 计数粒度不一致 = 绕过**。换 IP/UA 没用（锁定按账号维度计数）。缺陷代码还原见 [2026-08-14 改密爆破与单请求多凭据](./2026-08-14-改密接口爆破与单请求多凭据.md)。
+
 ---
 
 ## 下一阶段
 
-Access Control 已全部完成 ✅，Authentication 进行中（11/14），剩余：
+Access Control 已全部完成 ✅，Authentication 进行中（12/14），剩余：
 - 2FA bypass using a brute-force attack（2FA 爆破）
-- Password brute-force via password change（改密接口爆破）
-- Broken brute-force protection, multiple credentials per request（单请求多凭据）
+- Broken brute-force protection, multiple credentials per request（Lab 13 思路已通，实操通关后改 13/14）
 
