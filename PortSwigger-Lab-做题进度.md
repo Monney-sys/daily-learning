@@ -26,7 +26,7 @@
 
 ---
 
-## Authentication（认证缺陷）— 已完成 12/14（2026-08-11 开始，2026-08-14 更新）
+## Authentication（认证缺陷）— 已完成 13/14（2026-08-11 开始，2026-08-14 更新）
 
 > 关联笔记：[登录脆弱与认证缺陷](./2026-08-09-登录脆弱与认证缺陷.md)（总览）、[PortSwigger认证绕过实战](./2026-08-13-PortSwigger认证绕过实战.md)（Lab 8-11 实战）、[改密爆破与单请求多凭据](./2026-08-14-改密接口爆破与单请求多凭据.md)（Lab 12-13）
 
@@ -44,7 +44,7 @@
 | 10 | Offline password cracking | 密码哈希进 cookie + 存储型 XSS 组合 | 评论区 XSS 偷 carlos 的 stay-logged-in cookie → 解码拿 MD5 → 离线破解（hashcat）→ 明文登录删账户 |
 | 11 | Password reset poisoning via middleware | 密码重置投毒（重置链接域名可控） | 重置请求加 X-Forwarded-Host: 自己的 exploit server → 邮件链接指向攻击者 → carlos 点击 → token 进日志 → 拿自己合法链接换 token 改密 → 登录 |
 | 12 | Password brute-force via password change | 改密接口爆破（锁定逻辑缺陷） | 两次新密码填不一致 → 错误当前密码不触发锁定可无限爆破；响应含 New passwords do not match 即密码正确（隐藏 username 字段改成 carlos）（今天新做） |
-| 13 | Broken brute-force protection, multiple credentials per request | 单请求多凭据（计数粒度缺陷，EXPERT） | JSON 登录 body 的 password 改数组塞全部候选密码 → 一次请求试完 → 302 命中（思路已通，待实操） |
+| 13 | Broken brute-force protection, multiple credentials per request | 单请求多凭据（计数粒度缺陷，EXPERT） | JSON 登录 body 的 password 改数组塞全部候选密码 → 一次请求试完 → 302 命中（2026-08-14 通关） |
 
 ---
 
@@ -196,7 +196,6 @@ username=carlos&password=xxx
 
 ## 下一阶段
 
-Access Control 已全部完成 ✅，Authentication 进行中（12/14），剩余：
-- 2FA bypass using a brute-force attack（2FA 爆破）
-- Broken brute-force protection, multiple credentials per request（Lab 13 思路已通，实操通关后改 13/14）
+Access Control 已全部完成 ✅，Authentication 进行中（13/14），剩余：
+- 2FA bypass using a brute-force attack（2FA 爆破，Lab 14 进行中）
 
