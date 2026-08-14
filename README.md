@@ -107,6 +107,7 @@
 |------|------|
 | **操作系统漏洞发现（漏洞发现系列①）** — 扫描（Goby/Nmap/Nessus/OpenVAS/Nexpose）、类型（远程执行/提权/缓冲区溢出）、利用（MSF/Searchsploit/CNVD/Seebug/Exploit-DB/Packetstorm）、修复（补丁/关入口/防护） | [2026-08-13-操作系统漏洞发现.md](./2026-08-13-操作系统漏洞发现.md) |
 | **Web 应用漏洞发现（漏洞发现系列②）** — 工具框架（漏洞平台/CMS扫描器 WPScan·Joomscan·Drupalscan/综合扫描器 xray·ZAP·AppScan）、开发框架（PHP/Java/Python）、代码审计（函数名/功能点/格式头扫描）、人工测试（URL参数/功能测试） | [2026-08-13-Web应用漏洞发现.md](./2026-08-13-Web应用漏洞发现.md) |
+| **APP 应用漏洞发现（漏洞发现系列③）** — 抓包（Burp/Charles/Fiddler/抓包精灵 + Wireshark）、协议分流（WEB 协议复用 Web 思路/其他协议专项）、逆向（一键提取 APK URL + 反编译重打包测试） | [2026-08-14-APP应用漏洞发现.md](./2026-08-14-APP应用漏洞发现.md) |
 
 ### 操作系统与第三方安全
 | 主题 | 文件 |
@@ -144,6 +145,7 @@
 | **2026-08-13(续)** | **Web 应用漏洞发现（漏洞发现系列②）— 工具框架/开发框架识别/代码审计/人工测试** |
 | **2026-08-13(续2)** | **PortSwigger 认证机制绕过实战 — 2FA broken logic / stay-logged-in Cookie 爆破 / Offline password cracking / 密码重置投毒** |
 | **2026-08-14** | **改密接口爆破与单请求多凭据 — 新密码不一致绕过锁定 / JSON数组单请求多凭据 / 后端缺陷代码还原（Authentication 12/14）** |
+| **2026-08-14(续)** | **APP 应用漏洞发现（漏洞发现系列③）— 抓包分流（http/https·其他协议）/ 逆向（URL 资产提取·反编译重打包）** |
 
 ---
 
