@@ -50,6 +50,11 @@
 | 2026-08-28 | CVE-2018-1058（search_path 劫持）里「普通用户植入后门命令」具体建的是什么恶意对象？（函数？触发器？）怎么保证管理员一定触发？ | [数据库提权-五大数据库](./2026-08-28-数据库提权-五大数据库.md) | |
 | 2026-08-28 | 令牌窃取（churrasco/MSF incognito）在现代 Windows 还有效吗？ | [数据库提权-五大数据库](./2026-08-28-数据库提权-五大数据库.md) | |
 | 2026-08-28 | Oracle 注入模式下 sqlmap `--os-shell` 具体怎么用？无回显时怎么判断命令是否执行成功？（结合带外/写文件？） | [数据库提权-五大数据库](./2026-08-28-数据库提权-五大数据库.md) | |
+| 2026-08-28 | Juicy Potato 的 CLSID 列表怎么按系统版本选？（win7/win10/server 各版本对应哪些可用 CLSID？） | [Windows提权-Potato-DLL劫持-引号路径-服务权限](./2026-08-28(续)-Windows提权-Potato-DLL劫持-引号路径-服务权限.md) | GitHub CLSID/README |
+| 2026-08-28 | PrintSpoofer / Rogue Potato 的完整利用流程？（PrintSpoofer 具体怎么触发打印服务？Rogue Potato 的 socat 转发细节？） | [Windows提权-Potato-DLL劫持-引号路径-服务权限](./2026-08-28(续)-Windows提权-Potato-DLL劫持-引号路径-服务权限.md) | |
+| 2026-08-28 | 引号路径提权在 C:\ 默认不可写的现代系统上，实战还有多少空间？（非标准安装目录案例？） | [Windows提权-Potato-DLL劫持-引号路径-服务权限](./2026-08-28(续)-Windows提权-Potato-DLL劫持-引号路径-服务权限.md) | |
+| 2026-08-28 | DLL 劫持里 ProcMon 抓到一堆 NAME NOT FOUND 后，怎么快速筛选「能落地」的（目录可写 + 能触发重启）？ | [Windows提权-Potato-DLL劫持-引号路径-服务权限](./2026-08-28(续)-Windows提权-Potato-DLL劫持-引号路径-服务权限.md) | |
+| 2026-08-28 | sc config binPath= 修改服务后会不会留明显痕迹？（事件日志 7045/7040？管理员能否发现？） | [Windows提权-Potato-DLL劫持-引号路径-服务权限](./2026-08-28(续)-Windows提权-Potato-DLL劫持-引号路径-服务权限.md) | |
 ## 已解决
 
 （空）
