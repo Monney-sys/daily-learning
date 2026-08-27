@@ -95,6 +95,7 @@
 | **PortSwigger 认证机制绕过实战** — 2FA逻辑缺陷(verify参数可控+验证码爆破)/stay-logged-in Cookie伪造爆破(存密码哈希)/离线破解(XSS偷cookie+MD5还原)/密码重置投毒(Host头注入) + 方法论(先验证后攻击/业务特征判命中/隔离凭据源) | [2026-08-13-PortSwigger认证绕过实战.md](./2026-08-13-PortSwigger认证绕过实战.md) |
 | **PortSwigger 认证机制绕过实战二** — 改密接口爆破(两次新密码不一致绕过锁定/响应文案识别命中) + 单请求多凭据(JSON password 数组/计数粒度缺陷) + 后端缺陷代码还原 | [2026-08-14-改密接口爆破与单请求多凭据.md](./2026-08-14-改密接口爆破与单请求多凭据.md) |
 | **DC-1 靶机渗透实战（VulnHub 完整流程）** — 资产发现→Drupalgeddon2拿shell→数据库挖凭据→hashcat破Drupal7(53cr3t)→后台flag3→SUID find提权(euid=0) + 11个踩坑 | [2026-08-15-DC1靶机渗透实战.md](./2026-08-15-DC1靶机渗透实战.md) |
+| **Kioptrix Level 1 靶机渗透实战（VulnHub 完整流程）** — 资产发现→nmap→Web/SMB 探测（dirsearch/nbtscan/enum4linux/smbclient 工具扫盲）→Samba trans2open 远程溢出直接 root→SSH 收尾 + MSF payload 选型 + 老 SSH 算法兼容 + 疑问解答 | [2026-08-28(续2)-Kioptrix1靶机渗透实战.md](./2026-08-28(续2)-Kioptrix1靶机渗透实战.md) |
 
 ### 反序列化
 | 主题 | 文件 |
@@ -192,6 +193,7 @@
 | **2026-08-26** | **Windows 提权（权限提升②）— 溢出漏洞（信息收集→补丁筛选→MSF/EXP）+ 命令类提权 at/sc/ps + 数据库提权 + 思路点总结** |
 | **2026-08-28** | **数据库提权（权限提升③）— 五大库：MySQL UDF/MOF/启动项/反弹shell · MSSQL xp_cmdshell/OLE/沙盒模式/映像劫持 · Oracle 普通用户/DBA/注入 · Redis 计划任务/ssh公钥/webshell · PostgreSQL 两CVE + Windows 令牌窃取案例** |
 | **2026-08-28(续)** | **Windows 提权②：配置/服务类 — 烂土豆 Potato 家族（MS16-075/JuicyPotato/PrintSpoofer/GodPotato）· DLL劫持（搜索顺序/ProcMon）· 引号路径 · 服务权限（binPath修改/可写bin）+ winPEAS/PowerUp 工具链** |
+| **2026-08-28(续2)** | **Kioptrix Level 1 靶机渗透实战 — 完整流程（netdiscover→nmap→dirsearch→SMB 探测→trans2open 拿 root→SSH）+ 工具扫盲（dirsearch/nbtscan/enum4linux/smbclient）+ MSF payload 选型 + 老 SSH 兼容 + 疑问解答** |
 
 ---
 
