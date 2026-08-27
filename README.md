@@ -138,6 +138,7 @@
 |------|------|
 | **提权概述（小迪安全《提权》第一课）** — 提权前提=先弄清手上有什么权限；起点权限三类：① Webshell（后台功能点/思路点 + 漏洞单点/组合 + 第三方 编辑器·中间件·phpMyAdmin）、② 其他权限（数据库 mssql·mysql·oracle / 服务类 FTP·RDP·SSH / 第三方接口 邮件·支付·空间商）、③ 服务器系统（OS 层）；提权目标=最高权限(administrator/root/system) | [2026-08-25(续3)-权限提升概述.md](./2026-08-25(续3)-权限提升概述.md) |
 | **Windows 提权（小迪安全《提权》第二课）** — 溢出漏洞（信息收集→补丁筛选→MSF/EXP）+ 命令类提权 at（计划任务）/ sc（创建服务）/ ps（PsExec -s SYSTEM）+ 数据库提权 + 三个思路点（跨环境通用/系统版本区分/需特定环境）| [2026-08-26-Windows提权-补丁筛选与at-sc-ps提权.md](./2026-08-26-Windows提权-补丁筛选与at-sc-ps提权.md) |
+| **数据库提权（小迪安全《提权》第三课）** — 五大库：MySQL（UDF/MOF/启动项/反弹shell）、MSSQL（xp_cmdshell/sp_oacreate+sp_oamethod/沙盒模式/映像劫持）、Oracle（普通用户/DBA/注入模式）、Redis（计划任务反弹shell/写ssh公钥/低权限写webshell+修复）、PostgreSQL（CVE-2019-9193 COPY FROM PROGRAM / CVE-2018-1058 search_path）+ Windows 令牌窃取案例 | [2026-08-28-数据库提权-五大数据库.md](./2026-08-28-数据库提权-五大数据库.md) |
 
 
 | 主题 | 文件 |
@@ -188,6 +189,7 @@
 | **2026-08-25(续2)** | **Java 代码审计③（框架）— 识别/已知漏洞（版本CVE）/未知漏洞（过滤器·拦截器·框架特性·执行流程）+ Struts2 OGNL 断点验证 + Spring SpEL/无拦截器SQL注入** |
 | **2026-08-25(续3)** | **权限提升①：提权概述 — 权限来源三类（①Webshell 后台/漏洞/第三方 · ②其他权限 数据库/服务类/第三方接口 · ③服务器系统）+ 提权目标（最高权限）** |
 | **2026-08-26** | **Windows 提权（权限提升②）— 溢出漏洞（信息收集→补丁筛选→MSF/EXP）+ 命令类提权 at/sc/ps + 数据库提权 + 思路点总结** |
+| **2026-08-28** | **数据库提权（权限提升③）— 五大库：MySQL UDF/MOF/启动项/反弹shell · MSSQL xp_cmdshell/OLE/沙盒模式/映像劫持 · Oracle 普通用户/DBA/注入 · Redis 计划任务/ssh公钥/webshell · PostgreSQL 两CVE + Windows 令牌窃取案例** |
 
 ---
 
