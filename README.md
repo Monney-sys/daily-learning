@@ -142,6 +142,7 @@
 | **数据库提权（小迪安全《提权》第三课）** — 五大库：MySQL（UDF/MOF/启动项/反弹shell）、MSSQL（xp_cmdshell/sp_oacreate+sp_oamethod/沙盒模式/映像劫持）、Oracle（普通用户/DBA/注入模式）、Redis（计划任务反弹shell/写ssh公钥/低权限写webshell+修复）、PostgreSQL（CVE-2019-9193 COPY FROM PROGRAM / CVE-2018-1058 search_path）+ Windows 令牌窃取案例 | [2026-08-28-数据库提权-五大数据库.md](./2026-08-28-数据库提权-五大数据库.md) |
 | **Windows 提权②：配置/服务类（小迪《提权》续）** — 烂土豆 Potato 家族（MS16-075/JuicyPotato/PrintSpoofer，SeImpersonate 令牌冒充）+ DLL 劫持（搜索顺序/ProcMon 检测）+ 引号路径（Unquoted Service Path）+ 服务权限（弱权限 binPath 修改/可写 bin 替换）+ PowerUp/WinPEAS 工具链 | [2026-08-28(续)-Windows提权-Potato-DLL劫持-引号路径-服务权限.md](./2026-08-28(续)-Windows提权-Potato-DLL劫持-引号路径-服务权限.md) |
 | **Linux 提权①：总体框架（小迪《提权》Linux 开课）** — 针对环境（web/本地）→ 信息收集 8 项（内核信息/用户群组/环境信息/进程服务/计划任务/ssh私钥/明文密码/可写目录）→ 提权方法 5 类（SUID/内核漏洞/环境变量/计划任务/第三方服务）+ 与 Windows 提权对照 | [2026-08-28(续2)-Linux提权-总体框架.md](./2026-08-28(续2)-Linux提权-总体框架.md) |
+| **Linux 提权②：自动化脚本 + 内核漏洞 + SUID** — 四脚本（LinEnum/linuxprivchecker 信息收集 + linux-exploit-suggester/2 漏洞探针）+ 内核漏洞标准流程（寻可用→下exp→上/tmp→编译→执行→id 验证）+ 脏牛 Dirty COW 完整链路（vulnhub+Drupalgeddon2 入口）+ SUID（find -perm -4000 + GTFOBins）| [2026-08-28(续3)-Linux提权-自动化脚本与内核漏洞与SUID.md](./2026-08-28(续3)-Linux提权-自动化脚本与内核漏洞与SUID.md) |
 
 
 | 主题 | 文件 |
@@ -195,6 +196,7 @@
 | **2026-08-28** | **数据库提权（权限提升③）— 五大库：MySQL UDF/MOF/启动项/反弹shell · MSSQL xp_cmdshell/OLE/沙盒模式/映像劫持 · Oracle 普通用户/DBA/注入 · Redis 计划任务/ssh公钥/webshell · PostgreSQL 两CVE + Windows 令牌窃取案例** |
 | **2026-08-28(续)** | **Windows 提权②：配置/服务类 — 烂土豆 Potato 家族（MS16-075/JuicyPotato/PrintSpoofer/GodPotato）· DLL劫持（搜索顺序/ProcMon）· 引号路径 · 服务权限（binPath修改/可写bin）+ winPEAS/PowerUp 工具链** |
 | **2026-08-28(续2)** | **Linux 提权①：总体框架 — 针对环境（web/本地）· 信息收集 8 项清单 · 提权方法 5 类（SUID/内核漏洞/环境变量/计划任务/第三方服务）** |
+| **2026-08-28(续3)** | **Linux 提权②：自动化脚本 + 内核漏洞 + SUID — LinEnum/linuxprivchecker 信息收集 · linux-exploit-suggester 漏洞探针 · 内核漏洞六步流程（脏牛 Dirty COW 实战）· SUID 检测与姿势** |
 | **2026-08-28(续2)** | **Kioptrix Level 1 靶机渗透实战 — 完整流程（netdiscover→nmap→dirsearch→SMB 探测→trans2open 拿 root→SSH）+ 工具扫盲（dirsearch/nbtscan/enum4linux/smbclient）+ MSF payload 选型 + 老 SSH 兼容 + 疑问解答** |
 
 ---
