@@ -67,6 +67,9 @@
 | 2026-08-28 | g++ -lutil 的 -lutil 是干嘛的？（脏牛 EXP 依赖的库？） | [Linux提权-自动化脚本与内核漏洞与SUID](./2026-08-28(续3)-Linux提权-自动化脚本与内核漏洞与SUID.md) | |
 | 2026-08-28 | SUID 提权姿势完整清单？（GTFOBins 上常用哪些？怎么按场景挑？） | [Linux提权-自动化脚本与内核漏洞与SUID](./2026-08-28(续3)-Linux提权-自动化脚本与内核漏洞与SUID.md) | 查 GTFOBins |
 | 2026-08-28 | 内核 EXP 在目标机上编译失败怎么办？（目标机没 gcc → 静态编译/交叉编译/换 EXP？） | [Linux提权-自动化脚本与内核漏洞与SUID](./2026-08-28(续3)-Linux提权-自动化脚本与内核漏洞与SUID.md) | |
+| 2026-08-30 | crontab 相对路径劫持的具体写法？（cron 执行相对路径脚本时工作目录在哪？课程只给了劫持命令没给 crontab 原文） | [Linux提权-定时任务与环境变量](./2026-08-30-Linux提权-定时任务与环境变量.md) | |
+| 2026-08-30 | tar 通配符注入里 --checkpoint / --checkpoint-action 的具体机制？（checkpoint 间隔、exec 语法、tar 版本要求） | [Linux提权-定时任务与环境变量](./2026-08-30-Linux提权-定时任务与环境变量.md) | 参考 cnblogs.com/manong--/p/8012324 |
+| 2026-08-30 | sudo 提权（sudo -l / sudoers 错误配置 NOPASSWD/可写脚本）具体手法？课程说"鸡肋"但 freebuf 专门文章讲 | [Linux提权-定时任务与环境变量](./2026-08-30-Linux提权-定时任务与环境变量.md) | 待读 freebuf.com/vuls/217089 |
 ## 已解决
 
 （空）
