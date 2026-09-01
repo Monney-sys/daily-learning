@@ -77,16 +77,25 @@
 | 2026-08-30 | nishang 的 Invoke-PortScan 完整参数语法？演示文件在哪？ | [内网安全-基本认知与信息收集](./2026-08-30(续)-内网安全-基本认知与信息收集.md) | |
 | 2026-08-30 | 导图「局域网」分支下的两个空节点是什么内容？（非域环境横向怎么做？） | [内网安全-域横向渗透](./2026-08-30(续2)-内网安全-域横向渗透.md) | |
 | 2026-08-30 | 案例1 schtasks 完整语法（/sc 后是 ONCE 还是 MINUTE？/st 时间参数？）——截图截断 | [内网安全-域横向渗透](./2026-08-30(续2)-内网安全-域横向渗透.md) | Hermes 已按标准语法补全（/sc ONCE /st /ru /tn /tr），待实操验证 |
-| 2026-08-30 | CVE-2014-6324（MS14-068）/ CVE-2020-1472（Zerologon）在横向渗透里怎么用？课程只列编号 | [内网安全-域横向渗透](./2026-08-30(续2)-内网安全-域横向渗透.md) | || 2026-09-02 | 注册表开启 wdigest Auth 值（知识点1 第3条）具体操作？注册表路径/UseLogonCredential 值/是否重启？课程只列方案没展开 | [内网安全-域横向移动SMB与WMI传递](./2026-09-02-内网安全-域横向移动SMB与WMI传递.md) | |
-| 2026-09-02 | PTL（pass the ticket）/ PTK（pass the key）具体是什么？和 PTH 区别？什么场景用？ | [内网安全-域横向移动SMB与WMI传递](./2026-09-02-内网安全-域横向移动SMB与WMI传递.md) | |
-| 2026-09-02 | WMI「不会在目标日志留下痕迹」真的吗？开启完整审计（4688/4648）时 WMI 执行命令有没有日志？ | [内网安全-域横向移动SMB与WMI传递](./2026-09-02-内网安全-域横向移动SMB与WMI传递.md) | |
-| 2026-09-02 | LM Hash 算法细节？什么年代的系统还会碰到（XP/2003）？横向老机器的坑 | [内网安全-域横向移动SMB与WMI传递](./2026-09-02-内网安全-域横向移动SMB与WMI传递.md) | |
-| 2026-09-02 | smbexec 算官方还是 impacket？课程标题写官方自带、命令却是 impacket 格式 | [内网安全-域横向移动SMB与WMI传递](./2026-09-02-内网安全-域横向移动SMB与WMI传递.md) | 实操用 impacket 版验证 |
+| 2026-08-30 | CVE-2014-6324（MS14-068）/ CVE-2020-1472（Zerologon）在横向渗透里怎么用？课程只列编号 | [内网安全-域横向渗透](./2026-08-30(续2)-内网安全-域横向渗透.md) | || 2026-09-02 | 注册表开启 wdigest Auth 值（知识点1 第3条）具体操作？注册表路径/UseLogonCredential 值/是否重启？课程只列方案没展开 | [内网安全-域横向移动SMB与WMI传递](./2026-08-31-内网安全-域横向移动SMB与WMI传递.md) | |
+| 2026-09-02 | WMI「不会在目标日志留下痕迹」真的吗？开启完整审计（4688/4648）时 WMI 执行命令有没有日志？ | [内网安全-域横向移动SMB与WMI传递](./2026-08-31-内网安全-域横向移动SMB与WMI传递.md) | |
+| 2026-09-02 | LM Hash 算法细节？什么年代的系统还会碰到（XP/2003）？横向老机器的坑 | [内网安全-域横向移动SMB与WMI传递](./2026-08-31-内网安全-域横向移动SMB与WMI传递.md) | |
+| 2026-09-02 | smbexec 算官方还是 impacket？课程标题写官方自带、命令却是 impacket 格式 | [内网安全-域横向移动SMB与WMI传递](./2026-08-31-内网安全-域横向移动SMB与WMI传递.md) | 实操用 impacket 版验证 || 2026-09-02 | MS14-068（CVE-2014-6324）漏洞原理？为什么普通用户能伪造 TGT 冒充域管（PAC 校验缺失）？ | [内网安全-域横向移动PTH-PTK-PTT哈希票据传递](./2026-08-31-内网安全-域横向移动PTH-PTK-PTT哈希票据传递.md) | |
+| 2026-09-02 | kekeo tgt::ask 和 MS14-068 伪造 TGT 的区别？（hash 换合法 TGT vs 伪造带域管 PAC 的 TGT？） | [内网安全-域横向移动PTH-PTK-PTT哈希票据传递](./2026-08-31-内网安全-域横向移动PTH-PTK-PTT哈希票据传递.md) | |
+| 2026-09-02 | 本地票据导出（sekurlsa::tickets /export）的 .kirbi 直接 ptt 就能用？票据有效期/目标 SPN 限制？ | [内网安全-域横向移动PTH-PTK-PTT哈希票据传递](./2026-08-31-内网安全-域横向移动PTH-PTK-PTT哈希票据传递.md) | |
+| 2026-09-02 | PTT 连接要主机名不连 IP——DNS 解析不到时怎么办（hosts？）？Ladon 有哪些模块命令？ | [内网安全-域横向移动PTH-PTK-PTT哈希票据传递](./2026-08-31-内网安全-域横向移动PTH-PTK-PTT哈希票据传递.md) | || 2026-09-02 | Kerberoast 的「重写」（kerberoast.py -u 500/-g 512）就是银票据（Silver Ticket）？和 MS14-068 伪造 TGT（金票据思路）区别？ | [内网安全-域横向移动SPN-Kerberoast与CobaltStrike-RDP](./2026-09-01-内网安全-域横向移动SPN-Kerberoast与CobaltStrike-RDP.md) | |
+| 2026-09-02 | tgsrepcrack 破解的是什么 hash 类型？（rc4_hmac_md5 TGS → hashcat 模式 13100？） | [内网安全-域横向移动SPN-Kerberoast与CobaltStrike-RDP](./2026-09-01-内网安全-域横向移动SPN-Kerberoast与CobaltStrike-RDP.md) | |
+| 2026-09-02 | 请求 TGS / setspn 探针需要什么权限？（普通域用户即可？） | [内网安全-域横向移动SPN-Kerberoast与CobaltStrike-RDP](./2026-09-01-内网安全-域横向移动SPN-Kerberoast与CobaltStrike-RDP.md) | |
+| 2026-09-02 | winrs/winrm 横向的具体手法？（导图传递 5 类只剩它没展开） | [内网安全-域横向移动SPN-Kerberoast与CobaltStrike-RDP](./2026-09-01-内网安全-域横向移动SPN-Kerberoast与CobaltStrike-RDP.md) | || 2026-09-01 | 导图「穿透」节点下的内容？代理和穿透的区别？课程没展开 | [内网安全-域横向漫游Socket穿透代理隧道技术](./2026-09-01-内网安全-域横向漫游Socket穿透代理隧道技术.md) | |
+| 2026-09-01 | nps / reGeorg / earthworm 具体怎么用？（导图 8 工具只演示了 ngrok/frp）reGeorg 在「内网有过滤」场景的用法？ | [内网安全-域横向漫游Socket穿透代理隧道技术](./2026-09-01-内网安全-域横向漫游Socket穿透代理隧道技术.md) | |
+| 2026-09-01 | autoroute 和 socks4a 的区别与配合？（msf 内部路由 vs 本机代理出口）三层漫游中 Target2 正向 shell 的 rhost 怎么填？ | [内网安全-域横向漫游Socket穿透代理隧道技术](./2026-09-01-内网安全-域横向漫游Socket穿透代理隧道技术.md) | |
+| 2026-09-01 | proxychains 走 socks 为什么必须 -sT？（socks 不支持 SYN 半开？哪些 nmap 选项不兼容代理） | [内网安全-域横向漫游Socket穿透代理隧道技术](./2026-09-01-内网安全-域横向漫游Socket穿透代理隧道技术.md) | |
 ## 已解决
 
 （空）
 
-| 2026-09-02 | psexec 系（psexec/smbexec/wmiexec）和 atexec 的区别？什么场景选哪个？ | [内网安全-域横向移动SMB与WMI传递](./2026-09-02-内网安全-域横向移动SMB与WMI传递.md) | 已答：见 09-02 笔记工具选型表——at/atexec 走计划任务、psexec/smbexec 走 SMB(445)、wmic/wmiexec 走 WMI(135)；选型看端口(445/135)+是否传 hash(impacket -hashes)+免杀需求(官方免杀/impacket 易被杀) |
+| 2026-09-02 | psexec 系（psexec/smbexec/wmiexec）和 atexec 的区别？什么场景选哪个？ | [内网安全-域横向移动SMB与WMI传递](./2026-08-31-内网安全-域横向移动SMB与WMI传递.md) | 已答：见 09-02 笔记工具选型表——at/atexec 走计划任务、psexec/smbexec 走 SMB(445)、wmic/wmiexec 走 WMI(135)；选型看端口(445/135)+是否传 hash(impacket -hashes)+免杀需求(官方免杀/impacket 易被杀) |
+| 2026-09-02 | PTL/PTK 具体是什么？和 PTH 区别？什么场景用？ | [内网安全-域横向移动PTH-PTK-PTT哈希票据传递](./2026-08-31-内网安全-域横向移动PTH-PTK-PTT哈希票据传递.md) | 已答：课程确认导图 PTL 系笔误，正确为 PTT(pass the ticket)；三种=hash(PTH)/票据(PTT)/AES256(PTK)；KB2871997 后普通用户 PTH 失效→PTK/PTT；实操见 09-02(续) 笔记 |
 | 2026-08-26 | 数据库提权（MSSQL/MySQL）具体利用条件？什么时候走数据库提权而不是系统提权？ | [Windows提权-补丁筛选与at-sc-ps提权](./2026-08-26-Windows提权-补丁筛选与at-sc-ps提权.md) | 已答：见 08-28 数据库提权笔记「共性前提与判断」——手里只有数据库连接时走数据库提权；已是低权限系统用户时优先系统提权 |
 | 2026-08-28 | Oracle 普通用户 → DBA 的 PUBLIC 权限/PL/SQL 注入具体手法？ | [数据库提权-五大数据库](./2026-08-28-数据库提权-五大数据库.md) | 已答：08-28 查证资料补全——DBMS_EXPORT_EXTENSION 等 SYS 包 PL/SQL 注入（老版本）+ DBMS_JVM_EXP_PERMS 授 Java 权限 + Java 存储过程/DBMS_SCHEDULER 执行命令；详见笔记 §五 |
 | 2026-08-30 | CVE-2017-17010 编号疑似笔误（导图原文），用户确认按正确编号 CVE-2017-0144 (MS17-010 永恒之蓝) | [内网安全-域横向渗透](./2026-08-30(续2)-内网安全-域横向渗透.md) | 已答：导图笔误，按正确编号 |\n| 2026-08-18 | 导图里「数据库监控 / 文件监控」具体指什么工具手段？（开 SQL 日志看执行语句？文件完整性监控找 webshell？） | [PHP无框架代码审计入门](./2026-08-18-PHP无框架代码审计入门.md) | |

@@ -139,7 +139,10 @@
 |------|------|
 | **内网安全①（内网渗透开课第一课）** — 基本认知（名词/域模型/网络拓扑/实验环境）+ 信息收集四类（基本信息/网络信息/用户信息/凭据信息，案例1~4）+ 后续探针（存活主机/域控制器/网络架构/服务接口，案例5 + nishang）| [2026-08-30(续)-内网安全-基本认知与信息收集.md](./2026-08-30(续)-内网安全-基本认知与信息收集.md) |
 | **内网安全②（域横向渗透）** — 导图框架（域环境传递 5 类 + 漏洞 3 CVE）+ 案例1 at&schtasks 明文传递（IPC 链接/错误码 8 条速查）+ 案例2 atexec 明文·域内·PTH（-hashes）+ 案例3 FOR /F 批量四组合 + 案例4 用户名×密码双字典升级版 | [2026-08-30(续2)-内网安全-域横向渗透.md](./2026-08-30(续2)-内网安全-域横向渗透.md) |
-| **内网安全③（域横向移动）** — 知识点 wdigest（Win2012+/KB2871997 后拿不到明文 → 4 对策）+ LM/NTLM Hash 分界（Vista/2003）+ 案例1 Procdump+Mimikatz 凭据获取 + 案例2 SMB 传递（psexec 官方先IPC/直接凭据 + impacket psexec·smbexec -hashes PTH）+ 案例3 WMI 传递（wmic 无回显 / cscript wmiexec.vbs 有回显 / impacket wmiexec 明文·hash）+ 工具选型对比表（官方 vs impacket） | [2026-09-02-内网安全-域横向移动SMB与WMI传递.md](./2026-09-02-内网安全-域横向移动SMB与WMI传递.md) |
+| **内网安全③（域横向移动）** — 知识点 wdigest（Win2012+/KB2871997 后拿不到明文 → 4 对策）+ LM/NTLM Hash 分界（Vista/2003）+ 案例1 Procdump+Mimikatz 凭据获取 + 案例2 SMB 传递（psexec 官方先IPC/直接凭据 + impacket psexec·smbexec -hashes PTH）+ 案例3 WMI 传递（wmic 无回显 / cscript wmiexec.vbs 有回显 / impacket wmiexec 明文·hash）+ 工具选型对比表（官方 vs impacket） | [2026-08-31-内网安全-域横向移动SMB与WMI传递.md](./2026-08-31-内网安全-域横向移动SMB与WMI传递.md) |
+| **内网安全④（哈希票据传递）** — PTH(pass the hash: sekurlsa::pth /ntlm) / PTT(pass the ticket: MS14-068 漏洞·kekeo·本地票据导出) / PTK(pass the key: ekeys aes256) 三概念 + KB2871997 补丁影响（普通用户 PTH 失效→PTK/PTT）+ 案例3 MS14-068 普通用户拿域控 SYSTEM 全流程 + 案例4 Ladon 国产集成工具 | [2026-08-31-内网安全-域横向移动PTH-PTK-PTT哈希票据传递.md](./2026-08-31-内网安全-域横向移动PTH-PTK-PTT哈希票据传递.md) |
+| **内网安全⑤（SPN/Kerberoast + CS + RDP）** — 案例2 SPN 服务横向 Kerberoast 五步（setspn 探针→PowerShell 请求 TGS→mimikatz 导出→tgsrepcrack 破解→kerberoast.py 重写银票据 -u 500/-g 512→ptt 注入）+ 原理（TGS 用服务账号 NTLM hash RC4 加密，请求免费→离线爆破）+ 案例3 Cobalt Strike 一把梭哈（启动-配置-监听-上线-提权-信息收集-渗透）+ RDP 横向补充（明文/受限管理员 PTH/tscon 劫持） | [2026-09-01-内网安全-域横向移动SPN-Kerberoast与CobaltStrike-RDP.md](./2026-09-01-内网安全-域横向移动SPN-Kerberoast与CobaltStrike-RDP.md) |
+| **内网安全⑥（穿透代理/横向漫游）** — 基础（内外网/双内网通信/正向反向）+ 导图（解决三场景·方向·工具 8 件）+ 案例1 Ngrok 免费穿透（sunny+域名 lhost）+ 案例2 Frp 自建跳板（frps 6677/frpc remote_port 6000）+ 案例3 CFS 三层漫游（TP5_RCE→SQL注入→bind 正向+autoroute+socks4a→proxychains→MS17010 三 Flag）+ proxychains/Proxifier 代理使用 | [2026-09-01-内网安全-域横向漫游Socket穿透代理隧道技术.md](./2026-09-01-内网安全-域横向漫游Socket穿透代理隧道技术.md) |
 
 ### 操作系统与第三方安全### 权限提升
 
@@ -210,7 +213,10 @@
 | **2026-08-30** | **Linux 提权③：定时任务 + 环境变量 — 定时任务三问题（路径/命令-tar通配符注入/权限）· 环境变量提权（SUID+PATH劫持）· Linux 提权总结归类（searchsploit/exploitdb·sudo/密码复用/gid）** |
 | **2026-08-30(续)** | **内网渗透①：基本认知 + 信息收集 + 后续探针 — 名词/域模型/网络拓扑 · 信息收集四类命令（案例1~4）· 探针域控/存活主机/服务接口（案例5 + nishang）** |
 | **2026-08-30(续2)** | **内网渗透②：域横向渗透 — at&schtasks 明文传递（IPC/错误码）· atexec 明文·域内·PTH · FOR/F 批量四组合 · 用户名×密码双字典** |
-| **2026-09-02** | **内网渗透③：域横向移动 — SMB(445: psexec·smbexec) / WMI(135: wmic·wmiexec) 明文·HASH 传递 · wdigest/LM-NTLM 知识点 · Procdump+Mimikatz 凭据获取 · 工具选型（官方免杀 vs impacket）** |
+| **2026-08-31** | **内网渗透③：域横向移动 — SMB(445: psexec·smbexec) / WMI(135: wmic·wmiexec) 明文·HASH 传递 · wdigest/LM-NTLM 知识点 · Procdump+Mimikatz 凭据获取 · 工具选型（官方免杀 vs impacket）** |
+| **2026-08-31** | **内网渗透④：域横向移动 — PTH(ntlm hash) / PTT(TGT 票据: MS14-068·kekeo·本地票据) / PTK(aes256 key) · KB2871997 补丁影响 · Ladon 集成工具** |
+| **2026-09-01** | **内网渗透⑤：域横向移动 — SPN/Kerberoast（探针·请求·导出·破解·重写银票据）· Cobalt Strike 初体验 · RDP 横向（明文/受限管理员/劫持）** |
+| **2026-09-01** | **内网渗透⑥：穿透代理/横向漫游 — Ngrok 免费穿透 · Frp 自建跳板 · CFS 三层漫游（TP5_RCE→SQL注入→MS17010 + autoroute/socks4a/proxychains）** |
 
 ---
 
