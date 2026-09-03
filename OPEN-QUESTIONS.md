@@ -95,6 +95,8 @@
 | 2026-09-02 | lcx -slave/-tran/-listen 三模式原理与适用场景？-slave 为何能穿透防火墙入站过滤把 3389 送出来？ | [内网安全-域横向隧道技术网络层传输层应用层](./2026-09-02-内网安全-域横向隧道技术网络层传输层应用层.md) | |
 | 2026-09-02 | DNS 隧道配合 CS 的完整数据链路：A/NS 记录如何把 beacon 查询一步步引到 Teamserver:53/udp？（NS 委托原理） | [内网安全-域横向隧道技术网络层传输层应用层](./2026-09-02-内网安全-域横向隧道技术网络层传输层应用层.md) | |
 | 2026-09-02 | 导图工具 dns2tcp 与网络层 IPv6/GRE 隧道课程未演示——具体怎么实操？ | [内网安全-域横向隧道技术网络层传输层应用层](./2026-09-02-内网安全-域横向隧道技术网络层传输层应用层.md) | |
+| 2026-09-02 | Foreign 监听器与 MSF handler 的 payload 配对要求？（windows/foreign/reverse_tcp 与 reverse_tcp 是否同构、端口是否必须一致） | [内网安全-CobaltStrike与MSF联动Shell](./2026-09-02-内网安全-CobaltStrike与MSF联动Shell.md) | |
+| 2026-09-02 | payload_inject 注入到哪个进程？注入后原 MSF 会话还在吗？双会话并存/杀软风险？实战 CS↔MSF 互转的触发场景？ | [内网安全-CobaltStrike与MSF联动Shell](./2026-09-02-内网安全-CobaltStrike与MSF联动Shell.md) | |
 ## 已解决
 
 （空）
