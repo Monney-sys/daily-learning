@@ -1,4 +1,4 @@
-﻿# 每日学习收获
+# 每日学习收获
 
 记录每天的学习内容与收获，持续积累，持续成长。
 
@@ -142,7 +142,8 @@
 | **内网安全③（域横向移动）** — 知识点 wdigest（Win2012+/KB2871997 后拿不到明文 → 4 对策）+ LM/NTLM Hash 分界（Vista/2003）+ 案例1 Procdump+Mimikatz 凭据获取 + 案例2 SMB 传递（psexec 官方先IPC/直接凭据 + impacket psexec·smbexec -hashes PTH）+ 案例3 WMI 传递（wmic 无回显 / cscript wmiexec.vbs 有回显 / impacket wmiexec 明文·hash）+ 工具选型对比表（官方 vs impacket） | [2026-08-31-内网安全-域横向移动SMB与WMI传递.md](./2026-08-31-内网安全-域横向移动SMB与WMI传递.md) |
 | **内网安全④（哈希票据传递）** — PTH(pass the hash: sekurlsa::pth /ntlm) / PTT(pass the ticket: MS14-068 漏洞·kekeo·本地票据导出) / PTK(pass the key: ekeys aes256) 三概念 + KB2871997 补丁影响（普通用户 PTH 失效→PTK/PTT）+ 案例3 MS14-068 普通用户拿域控 SYSTEM 全流程 + 案例4 Ladon 国产集成工具 | [2026-08-31-内网安全-域横向移动PTH-PTK-PTT哈希票据传递.md](./2026-08-31-内网安全-域横向移动PTH-PTK-PTT哈希票据传递.md) |
 | **内网安全⑤（SPN/Kerberoast + CS + RDP）** — 案例2 SPN 服务横向 Kerberoast 五步（setspn 探针→PowerShell 请求 TGS→mimikatz 导出→tgsrepcrack 破解→kerberoast.py 重写银票据 -u 500/-g 512→ptt 注入）+ 原理（TGS 用服务账号 NTLM hash RC4 加密，请求免费→离线爆破）+ 案例3 Cobalt Strike 一把梭哈（启动-配置-监听-上线-提权-信息收集-渗透）+ RDP 横向补充（明文/受限管理员 PTH/tscon 劫持） | [2026-09-01-内网安全-域横向移动SPN-Kerberoast与CobaltStrike-RDP.md](./2026-09-01-内网安全-域横向移动SPN-Kerberoast与CobaltStrike-RDP.md) |
-| **内网安全⑥（穿透代理/横向漫游）** — 基础（内外网/双内网通信/正向反向）+ 导图（解决三场景·方向·工具 8 件）+ 案例1 Ngrok 免费穿透（sunny+域名 lhost）+ 案例2 Frp 自建跳板（frps 6677/frpc remote_port 6000）+ 案例3 CFS 三层漫游（TP5_RCE→SQL注入→bind 正向+autoroute+socks4a→proxychains→MS17010 三 Flag）+ proxychains/Proxifier 代理使用 | [2026-09-01-内网安全-域横向漫游Socket穿透代理隧道技术.md](./2026-09-01-内网安全-域横向漫游Socket穿透代理隧道技术.md) |
+| **内网安全⑥（穿透代理/横向漫游）** — 基础（内外网/双内网通信/正向反向）+ 导图（解决三场景·方向·工具 8 件）+ 案例1 Ngrok 免费穿透（sunny+域名 lhost）+ 案例2 Frp 自建跳板（frps 6677/frpc remote_port 6000）+ 案例3 CFS 三层漫游（TP5_RCE→SQL注入→bind 正向+autoroute+socks4a→proxychains→MS17010 三 Flag）+ proxychains/Proxifier 代理使用 | [2026-09-01-内网安全-域横向漫游Socket穿透代理隧道技术.md](./2026-09-01-内网安全-域横向漫游Socket穿透代理隧道技术.md) |
+| **内网安全⑦（域横向隧道技术）** — 必备知识点 3 问（代理vs隧道/解决什么/前期必备条件）+ 隧道定义（用防火墙放行协议封装穿过边界→还原）+ 三层分类总览（网络层 IPv6·ICMP·GRE / 传输层 TCP·UDP·常规端口转发 / 应用层 SSH·HTTP(S)·DNS）+ 案例1 出网连通性检测（nc/curl/ping/nslookup·dig）+ 案例2 ICMP 隧道 ptunnel（-p/-lp/-da/-dp/-x → rdesktop 本地1080）+ 案例3 端口转发 lcx/portmap（-slave 主动外连交3389 / -listen 中转）+ 案例4 netcat 双向连接反弹shell（正向/反向）+ 多向连接 lcx 配合转发 + nc 功能测试（指纹/扫描/监听/文件传输）+ 案例5 DNS 隧道配合 CS 上线（Teamserver 53/udp + A/NS 记录委托 + DNS 监听器 + beacon mode dns-txt） | [2026-09-02-内网安全-域横向隧道技术网络层传输层应用层.md](./2026-09-02-内网安全-域横向隧道技术网络层传输层应用层.md) |
 
 ### 操作系统与第三方安全### 权限提升
 
@@ -216,7 +217,9 @@
 | **2026-08-31** | **内网渗透③：域横向移动 — SMB(445: psexec·smbexec) / WMI(135: wmic·wmiexec) 明文·HASH 传递 · wdigest/LM-NTLM 知识点 · Procdump+Mimikatz 凭据获取 · 工具选型（官方免杀 vs impacket）** |
 | **2026-08-31** | **内网渗透④：域横向移动 — PTH(ntlm hash) / PTT(TGT 票据: MS14-068·kekeo·本地票据) / PTK(aes256 key) · KB2871997 补丁影响 · Ladon 集成工具** |
 | **2026-09-01** | **内网渗透⑤：域横向移动 — SPN/Kerberoast（探针·请求·导出·破解·重写银票据）· Cobalt Strike 初体验 · RDP 横向（明文/受限管理员/劫持）** |
-| **2026-09-01** | **内网渗透⑥：穿透代理/横向漫游 — Ngrok 免费穿透 · Frp 自建跳板 · CFS 三层漫游（TP5_RCE→SQL注入→MS17010 + autoroute/socks4a/proxychains）** |
+| **2026-09-01** | **内网渗透⑥：穿透代理/横向漫游 — Ngrok 免费穿透 · Frp 自建跳板 · CFS 三层漫游（TP5_RCE→SQL注入→MS17010 + autoroute/socks4a/proxychains）** |
+
+| **2026-09-02** | **内网渗透⑦：域横向隧道技术 — 出网连通性检测(nc/curl/ping/nslookup·dig) · ICMP隧道 ptunnel · 端口转发 lcx/portmap · netcat TCP隧道(正反向反弹shell·lcx多向转发·指纹/扫描/文件传输) · DNS隧道配合CS上线(mode dns-txt)** |
 
 ---
 
