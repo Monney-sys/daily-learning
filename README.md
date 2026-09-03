@@ -146,6 +146,12 @@
 | **内网安全⑦（域横向隧道技术）** — 必备知识点 3 问（代理vs隧道/解决什么/前期必备条件）+ 隧道定义（用防火墙放行协议封装穿过边界→还原）+ 三层分类总览（网络层 IPv6·ICMP·GRE / 传输层 TCP·UDP·常规端口转发 / 应用层 SSH·HTTP(S)·DNS）+ 案例1 出网连通性检测（nc/curl/ping/nslookup·dig）+ 案例2 ICMP 隧道 ptunnel（-p/-lp/-da/-dp/-x → rdesktop 本地1080）+ 案例3 端口转发 lcx/portmap（-slave 主动外连交3389 / -listen 中转）+ 案例4 netcat 双向连接反弹shell（正向/反向）+ 多向连接 lcx 配合转发 + nc 功能测试（指纹/扫描/监听/文件传输）+ 案例5 DNS 隧道配合 CS 上线（Teamserver 53/udp + A/NS 记录委托 + DNS 监听器 + beacon mode dns-txt） | [2026-09-02-内网安全-域横向隧道技术网络层传输层应用层.md](./2026-09-02-内网安全-域横向隧道技术网络层传输层应用层.md) |
 | **内网安全（CS 联动 MSF 补充，承接⑤ CS 基础）** — 案例1 MSF&CS 联动 Shell 双向会话转手：CS→MSF（创建 Foreign 监听器 → MSF handler 设对应地址端口 → beacon Spawn 选择监听器派生 meterpreter）+ MSF→CS（CS 创建监听器 → MSF use exploit/windows/local/payload_inject 注入 SESSION 设对应地址端口 → CS 等待上线） | [2026-09-02-内网安全-CobaltStrike与MSF联动Shell.md](./2026-09-02-内网安全-CobaltStrike与MSF联动Shell.md) |
 
+### 应急响应
+
+| 主题 | 文件 |
+|------|------|
+| **应急响应①（总体框架与溯源思路）** — 导图四阶段：表现（网站/文件/系统/流量/第三方异常症状）→ 收集（win&linux&mac 八项：对外服务/开放端口/系统版本/网络环境/漏洞情况/软件平台/口令整理/有无防护）→ 攻击（WEB 漏洞/结合/流量 · 第三方 数据库/远程软件/服务平台 · 操作系统 提权/内网渗透/远程漏洞）→ 追查（据表现选法：日志/后门/流量/脚本软件/模拟渗透分析）+ 案例2 WEB 首页被篡改（日志时间基线：前=攻击分析/后=操作分析 · webshell 查杀定位首次写入）+ 案例3 WIN 服务器卡顿（PCHunter64 进程监控 / UserAssistView 执行列表 / AppCompatCacheParser 时间线） | [2026-09-02-应急响应-总体框架与溯源.md](./2026-09-02-应急响应-总体框架与溯源.md) |
+
 ### 操作系统与第三方安全### 权限提升
 
 | 主题 | 文件 |
@@ -222,7 +228,9 @@
 
 | **2026-09-02** | **内网渗透⑦：域横向隧道技术 — 出网连通性检测(nc/curl/ping/nslookup·dig) · ICMP隧道 ptunnel · 端口转发 lcx/portmap · netcat TCP隧道(正反向反弹shell·lcx多向转发·指纹/扫描/文件传输) · DNS隧道配合CS上线(mode dns-txt)** |
 
-| **2026-09-02** | **内网渗透（CS 联动补充）：MSF & CS 联动 Shell — CS→MSF(Foreign 监听器+Spawn 派生) / MSF→CS(payload_inject 注入回连) 双向会话转手** |
+| **2026-09-02** | **内网渗透（CS 联动补充）：MSF & CS 联动 Shell — CS→MSF(Foreign 监听器+Spawn 派生) / MSF→CS(payload_inject 注入回连) 双向会话转手** |
+
+| **2026-09-02** | **应急响应①：总体框架与溯源 — 表现(网站篡改/系统卡顿/流量外连等5类症状) → 收集(8项) → 攻击(WEB/第三方/OS) → 追查(日志/后门/流量/脚本/模拟渗透) · 案例2 WEB被篡改(时间基线法) · 案例3 WIN卡顿(PCHunter64/UserAssistView/AppCompatCacheParser)** |
 
 ---
 
