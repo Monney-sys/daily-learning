@@ -46,6 +46,36 @@
 | 12 | Password brute-force via password change | 改密接口爆破（锁定逻辑缺陷） | 两次新密码填不一致 → 错误当前密码不触发锁定可无限爆破；响应含 New passwords do not match 即密码正确（隐藏 username 字段改成 carlos）（今天新做） |
 | 13 | Broken brute-force protection, multiple credentials per request | 单请求多凭据（计数粒度缺陷，EXPERT） | JSON 登录 body 的 password 改数组塞全部候选密码 → 一次请求试完 → 302 命中（2026-08-14 通关） |
 
+## XSS 跨站脚本 — 已完成 7/30（2026-09-12 开始）
+
+> 关联笔记：[PortSwigger XSS 实战前七题](./2026-09-12-PortSwigger-XSS实战前七题.md)（含三张实测表：上下文→向量 / 属性→自动触发 / jQuery 版本边界）
+
+| # | Lab | 核心考点 | 攻击手法 |
+|---|-----|---------|---------|
+| 1 | Reflected XSS into HTML context with nothing encoded | 反射型 + 无编码 | 搜索词原样回显 → 直接插标签；投递用 exploit server 的 `location=` |
+| 2 | Stored XSS into HTML context with nothing encoded | 存储型 + 无编码 | 评论里插标签存库，受害者浏览帖子即中 |
+| 3 | DOM XSS in document.write sink using source location.search | DOM 型 + 输入落在属性里 | 右键检查元素看落点 → 闭合属性再插标签：`"><svg onload=print()>` |
+| 4 | DOM XSS in innerHTML sink using source location.search | innerHTML 不执行 `<script>` | 换"会自己报错的元素"：`<img src=1 onerror=print()>` |
+| 5 | DOM XSS in jQuery anchor href attribute sink using location.search source | URL 属性不需要尖括号 | `returnPath=javascript:print()` → 点 back 触发（需一次点击） |
+| 6 | DOM XSS in jQuery selector sink using a hashchange event | hash 进 jQuery 选择器 + 老 jQuery | exploit server 放 iframe，`onload` 追加 payload 改 hash → hashchange 触发；jQuery ≤1.8.3 才可打 |
+| 7 | Reflected XSS into attribute with angle brackets HTML-encoded | 尖括号被 HTML 实体编码 | 闭合引号 + 加事件属性（`"autofocus onfocus="print()`，或官方 `"onmouseover=`）；要多试属性直到受害者能触发 |
+
+### XSS 知识点总结
+
+**三类 sink ↔ 三种投递壳**（新题先问三句：payload 从哪进？服务端看得到吗？谁在什么时刻执行？）
+- 反射/存储：payload 进服务端响应 → `<script>location='https://LAB/?q=payload'</script>` 或直接提交表单
+- 纯 DOM（`location.hash` / `location.search`）：**服务端看不到 payload** → 必须 `iframe + onload` 制造事件
+
+**DOM 型三个必记点**
+1. `onload` 里的代码跑在**攻击者 origin**，真正执行 payload 的是**目标站自己的 JS**；iframe 只负责"把受害者带过去 + 改地址"
+2. fragment 变化 = **同一文档内导航**（不重载、不发请求，只触发 `hashchange`）→ 所以不能把 payload 直接写在 `src` 里，只能"先加载空 `#`，再由 `onload` 追加"；且浏览器会把片段里的 `< >` 百分号编码，目标端要有 `decodeURIComponent` 才能还原
+3. 同源策略：只能改 iframe 的**地址**，碰不到目标文档的 DOM（`contentDocument` = null / `location` 抛 SecurityError）
+
+**属性注入（尖括号被编码时的正解）**
+- 属性随便加，但执行与否取决于"那个事件会不会被触发"：`autofocus + onfocus`、`style animation + onanimationstart` 是**零交互**（最稳）；`onmouseover` / `onclick` / `href="javascript:"` 需要交互
+- 官方 payload 结尾**不写引号**，借用页面原属性的闭合引号收尾
+- 官方 Hint：**"你能弹 ≠ 受害者能弹"** → 多试属性 = 穷举（这也是后面 Practitioner 题 "event handlers and href attributes blocked" 的核心）
+
 ---
 
 ## 知识点总结
@@ -196,6 +226,6 @@ username=carlos&password=xxx
 
 ## 下一阶段
 
-Access Control 已全部完成 ✅，Authentication 进行中（13/14），剩余：
-- 2FA bypass using a brute-force attack（2FA 爆破，Lab 14 进行中）
-
+- **XSS 模块进行中（7/30）**：下一道 = Stored XSS into anchor href attribute with double quotes HTML-encoded（#8，正好是"评论区放网址"思路的完整版，payload 用 `javascript:`）；之后 DOM 型续练（document.write inside select / AngularJS 表达式 / Reflected DOM XSS / Stored DOM XSS）
+- **Authentication 收尾**：剩 1 道 —— 2FA bypass using a brute-force attack（Lab 14，EXPERT，关键 = Burp Macro + Session handling rule）
+- **XXE 进行中（2/9）**：Lab 3/4/5 盲打三连待做（需要 Collaborator / exploit server 收外带请求）

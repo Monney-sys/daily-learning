@@ -62,6 +62,7 @@
 | **XSS 入门认知框架** — 原理/反射型·存储型·DOM 型/利用手法/绕过(WAF·HttpOnly·代码过滤)/防御方案 | [2026-08-02-XSS跨站脚本攻击入门.md](./2026-08-02-XSS跨站脚本攻击入门.md) |
 | **XSS 平台与工具 + HttpOnly 绕过** — BeEF/XSS Hunter/ezXSS 平台利用、XSStrike/Dalfox 工具、HttpOnly 防偷不防用原理、XSS Labs 1~13 实战 | [2026-08-03-XSS平台工具与HttpOnly绕过.md](./2026-08-03-XSS平台工具与HttpOnly绕过.md) |
 | **XSS WAF 绕过体系 + 安全修复** — 12 种绕过手法（标签替换/编码/混淆/溢出/HPP）+ CSP/HttpOnly/输出编码纵深防御 | [2026-08-04-XSS-WAF绕过与安全修复.md](./2026-08-04-XSS-WAF绕过与安全修复.md) |
+| **PortSwigger XSS 模块实战（前七题）** — 反射/存储/DOM 三型 7 道 lab 通关 · 三类 sink↔三种投递壳（反射:location / 存储:提交表单 / DOM:iframe+onload）· iframe 只负责「带过去+改地址」· fragment=同文档导航（必须 decodeURIComponent）· 属性注入：autofocus+onfocus 零交互 · jQuery ≤1.8.3 才可打 | [2026-09-12-PortSwigger-XSS实战前七题.md](./2026-09-12-PortSwigger-XSS实战前七题.md) |
 
 ### CSRF / SSRF
 | 主题 | 文件 |
@@ -244,6 +245,7 @@
 | **2026-09-03** | **应急响应①：WEB 入侵排查展开 — 流程五阶段(保护/分析/复现/修复/建议) · 准备4项/知识点3项 · 分析方法4种(指纹库/日志时间/后门追查/漏洞检查) · 有/无明确信息两种排查场景 · 案例1 Windows+IIS+Sql(日志搜索) 案例2 Linux+BT_Nginx+tp5(日志后门) 开场** |
 
 | **2026-09-03** | **应急响应·操作系统篇：Win/Linux 主机应急 — 日志类别与存储 · 危害5类/分析8项 · 案例1 暴力破解 RDP/SSH(LogFusion 事件ID + secure 五连grep) · 案例2 后门木马(CrossC2+netstat) · 案例3 勒索 WannaCry(360/NoMoreRansom 恢复站) · 案例4 Gscan 自动化** || **2026-09-04** | **应急响应（收官）：数据库应急与漏洞口令检索 — 案例1 LogonTracer(neo4j 图) · 案例2 数据库日志(MySQL general_log/MSSQL/Oracle) · 案例3 自查漏洞·模拟渗透(补丁/服务/弱口令三线) · 案例4 ir-rescue · 必须知识点 · 待做:知攻善防应急靶场** |
+| **2026-09-12** | **PortSwigger XSS 模块前七题实战 — 反射型/存储型/DOM 型七道全通 · 三类 sink↔三种投递壳 · iframe+onload 投递机制与同源边界实测 · 尖括号被 HTML 实体编码时的属性注入解法 · 零交互属性（autofocus+onfocus / animation）实测 · jQuery 选择器 sink 版本边界（≤1.8.3） · 编码/解码链** |
 
 ---
 
