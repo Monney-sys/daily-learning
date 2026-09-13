@@ -78,6 +78,48 @@
 
 ---
 
+## CSRF 跨站请求伪造 — 已完成 4/11（2026-09-12 开始，第 5 关暂停）
+
+> 关联笔记：CSRF 1-4 实战待补（暂定整块打完后并入当日笔记）
+> 现状：1-4 已过（第 2/3/4 关都是 Practitioner）；第 5 关「token 绑 non-session cookie」暂停，先转 SSRF 模块
+
+| # | Lab | 核心考点 | 攻击手法 |
+|---|-----|---------|---------|
+| 1 | CSRF vulnerability with no defenses | 完全无防御 | 直接构造自动提交表单改邮箱：exploit server **Body** → Store → View exploit → Deliver to victim |
+| 2 | CSRF where token validation depends on request method | 校验只覆盖 POST 分支（**方法维度**） | 换 GET 提交 + 不带 token → 走到不校验的那个分支 |
+| 3 | CSRF where token validation depends on token being present | 参数存在才校验（**存在性维度**） | 删掉 csrf 参数；⚠️ 我实际是用第 2 关那套（GET + 无 token）过的 —— 两条缺陷在这条路径上重叠，**本题考点未单独验证**（待补对照实验：POST + 删 csrf） |
+| 4 | CSRF where token is not tied to user session | token 不绑定会话（**归属维度**） | 用我自己账号抓来的合法 token 填进攻击页面：服务端只查「token 在不在合法池里」，**不查「属不属于这个会话」**；⚠️ token 单次有效 → 每次 Deliver 前必须重新抓一个（自测 View exploit 会消耗掉） |
+
+### CSRF 知识点总结（我的版本）
+
+**防 CSRF token 的三条命门 —— 漏任何一条就是一个绕过点**：
+
+| 维度 | 正确做法 | 漏掉的后果 | 对应 lab |
+|---|---|---|---|
+| 方法 | 所有能改状态的入口（GET/POST…）都校验 | 换请求方法绕过 | 2 |
+| 存在性 | 参数缺失 = 直接拒绝（不能「取不到就跳过」） | 删掉参数绕过 | 3 |
+| 归属 | token 必须绑定当前会话（`session['csrf'] == token`） | 拿别人的 token 绕过 | 4 |
+
+**一句话认知**：token 要同时满足「**是真的**」+「**必须带**」+「**是我的**」—— 三者缺一就是三个不同的绕过点。第 4 关漏的不是「值存不存在」，而是「值的归属」。
+
+缺陷写法对照（审计/代码审计时一眼认出）：
+
+```python
+# ❌ 只在有值时校验（Lab 3）
+if token and token != session['csrf']: reject()
+# ❌ 只查全局池子，不绑会话（Lab 4）
+if token not in VALID_TOKEN_POOL: reject()
+# ✅ 正确
+if not token or token != session.get('csrf'): reject()
+```
+
+**读 writeup 的反射**：`YOUR-LAB-ID` / `$param1name` / `$param1value` / `ATTACKER.COM` 都是**占位符**；判断标准 =「这个字符串在真实请求里出现过吗？」（`$param1name` 要换成请求体里真实的参数名，本题 = `email`）。
+
+**过关判定**：不看状态码，去 My account 页面确认邮箱真的变了。
+
+
+---
+
 ## 知识点总结
 
 ### 越权的四种模式
@@ -226,6 +268,8 @@ username=carlos&password=xxx
 
 ## 下一阶段
 
-- **XSS 模块进行中（7/30）**：下一道 = Stored XSS into anchor href attribute with double quotes HTML-encoded（#8，正好是"评论区放网址"思路的完整版，payload 用 `javascript:`）；之后 DOM 型续练（document.write inside select / AngularJS 表达式 / Reflected DOM XSS / Stored DOM XSS）
+- **SSRF 模块进行中（0/7，2026-09-12 开始）**：Lab 1 = Basic SSRF against the local server（Apprentice）→ 之后 Basic SSRF against another back-end system → Blind SSRF with out-of-band detection → blacklist 绕过 → 开放重定向绕过 → Shellshock → whitelist 绕过
+- **CSRF 暂停（4/11）**：下一关 = CSRF where token is tied to non-session cookie（要把 token 和「非会话 cookie」捏到一起，方向 = cookie 注入/CRLF）；另待补第 3 关的对照实验（POST + 删 csrf 是否通过）
+- **XSS 模块进行中（7/30）**：下一道 = Stored XSS into anchor href attribute with double quotes HTML-encoded（#8，正好是「评论区放网址」思路的完整版，payload 用 `javascript:`）；之后 DOM 型续练（document.write inside select / AngularJS 表达式 / Reflected DOM XSS / Stored DOM XSS）
 - **Authentication 收尾**：剩 1 道 —— 2FA bypass using a brute-force attack（Lab 14，EXPERT，关键 = Burp Macro + Session handling rule）
 - **XXE 进行中（2/9）**：Lab 3/4/5 盲打三连待做（需要 Collaborator / exploit server 收外带请求）
