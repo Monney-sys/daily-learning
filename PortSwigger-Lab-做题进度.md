@@ -120,6 +120,27 @@ if not token or token != session.get('csrf'): reject()
 
 ---
 
+## SSRF 服务端请求伪造 — 已完成 3/7（2026-09-12 开始）
+
+> 关联笔记：[PortSwigger SSRF 前三关实战与 Collaborator 认知](./2026-09-12(续)-PortSwigger-SSRF前三关与Collaborator.md)
+> 7 关递进：回显型（打本机/打内网）→ 盲打 OOB → 黑名单绕过 → 开放重定向绕过 → Shellshock 盲打 → 白名单绕过
+
+| # | Lab | 核心考点 | 攻击手法 |
+|---|-----|---------|---------|
+| 1 | Basic SSRF against the local server | 回显型 SSRF（服务端代你访问本机） | 商品页 Check stock 的 `stockApi` 换成 `http://localhost/admin` → 从返回 HTML 读删除链接 → `stockApi=http://localhost/admin/delete?username=carlos` |
+| 2 | Basic SSRF against another back-end system | 回显型 + 内网探测 | `stockApi=http://192.168.0.1:8080/admin`，末位八位组设 Intruder Numbers payload 1→255 → 状态码 200 那条就是内网 admin → 改路径 `/admin/delete?username=carlos` |
+| 3 | Blind SSRF with out-of-band detection | **盲打**（不回显，靠带外信号）+ 注入点在**请求头** | 商品页文档请求的 `Referer` 域名段换成 Burp Collaborator 域 → Send → Collaborator Poll now → 出现 DNS + HTTP（Source IP = 靶场）= 过关 |
+
+### SSRF 知识点总结（我的版本）
+
+- **三形态**：回显型（看响应）→ 回显型·打内网（看状态码/内容）→ **盲打**（看带外：Collaborator 的 DNS + HTTP）。
+- **盲打三问**：谁在发请求？我给的地址会到哪？我怎么知道它去了？（= 判定信号从"响应"换成"带外交互"）
+- **注入点特征**：值"长得像 URL/域名/路径/IP"的参数（`stockApi`/`url`/`dest`/`callback`/`webhook`…）**以及请求头**（`Referer`/`User-Agent`/`X-Forwarded-For`/`Host`）。
+- **坑**：改了值但没换成自己的带外域（等于让服务端访问它自己）→ 面板空白；lab 防火墙只放行**默认公共** Collaborator；自测流量会污染记录（看 Source IP/UA 区分）。
+
+
+---
+
 ## 知识点总结
 
 ### 越权的四种模式
@@ -268,8 +289,8 @@ username=carlos&password=xxx
 
 ## 下一阶段
 
-- **SSRF 模块进行中（0/7，2026-09-12 开始）**：Lab 1 = Basic SSRF against the local server（Apprentice）→ 之后 Basic SSRF against another back-end system → Blind SSRF with out-of-band detection → blacklist 绕过 → 开放重定向绕过 → Shellshock → whitelist 绕过
-- **CSRF 暂停（4/11）**：下一关 = CSRF where token is tied to non-session cookie（要把 token 和「非会话 cookie」捏到一起，方向 = cookie 注入/CRLF）；另待补第 3 关的对照实验（POST + 删 csrf 是否通过）
-- **XSS 模块进行中（7/30）**：下一道 = Stored XSS into anchor href attribute with double quotes HTML-encoded（#8，正好是「评论区放网址」思路的完整版，payload 用 `javascript:`）；之后 DOM 型续练（document.write inside select / AngularJS 表达式 / Reflected DOM XSS / Stored DOM XSS）
+- **SSRF 模块进行中（3/7）**：第 4 关 = SSRF with blacklist-based input filter（黑名单绕过 → 环回地址等价写法：`127.1` / 十进制 `2130706433` / 八进制 / 十六进制 / 大小写变体）；之后 开放重定向绕过 → Shellshock 盲打 → whitelist 绕过
+- **CSRF 暂停（4/11）**：下一关 = CSRF where token is tied to non-session cookie；另待补第 3 关的对照实验（POST + 删 csrf 是否通过）
+- **XSS 模块进行中（7/30）**：下一道 = Stored XSS into anchor href attribute with double quotes HTML-encoded（#8，payload 用 `javascript:`）
 - **Authentication 收尾**：剩 1 道 —— 2FA bypass using a brute-force attack（Lab 14，EXPERT，关键 = Burp Macro + Session handling rule）
 - **XXE 进行中（2/9）**：Lab 3/4/5 盲打三连待做（需要 Collaborator / exploit server 收外带请求）

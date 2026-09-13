@@ -68,6 +68,7 @@
 | 主题 | 文件 |
 |------|------|
 | **CSRF 与 SSRF 漏洞详解** — 原理/探测方法/攻击场景/防御方案 + 内外网概念 + XSS/CSRF/SSRF 横向对比 | [2026-08-04-CSRF与SSRF漏洞详解.md](./2026-08-04-CSRF与SSRF漏洞详解.md) |
+| **PortSwigger SSRF 模块实战（前三关）** — 回显型 ×2（`stockApi` 打本机 localhost/admin、Intruder 扫 192.168.0.1-255:8080 打内网后端）+ 盲打型 ×1（注入点在 `Referer` 头 · 用 Burp Collaborator 收 DNS+HTTP 带外信号 · 盲打三问 · lab 只放行默认公共 Collaborator） | [2026-09-12(续)-PortSwigger-SSRF前三关与Collaborator.md](./2026-09-12(续)-PortSwigger-SSRF前三关与Collaborator.md) |
 
 ### 文件包含漏洞
 | 主题 | 文件 |
@@ -246,6 +247,7 @@
 
 | **2026-09-03** | **应急响应·操作系统篇：Win/Linux 主机应急 — 日志类别与存储 · 危害5类/分析8项 · 案例1 暴力破解 RDP/SSH(LogFusion 事件ID + secure 五连grep) · 案例2 后门木马(CrossC2+netstat) · 案例3 勒索 WannaCry(360/NoMoreRansom 恢复站) · 案例4 Gscan 自动化** || **2026-09-04** | **应急响应（收官）：数据库应急与漏洞口令检索 — 案例1 LogonTracer(neo4j 图) · 案例2 数据库日志(MySQL general_log/MSSQL/Oracle) · 案例3 自查漏洞·模拟渗透(补丁/服务/弱口令三线) · 案例4 ir-rescue · 必须知识点 · 待做:知攻善防应急靶场** |
 | **2026-09-12** | **PortSwigger XSS 模块前七题实战 — 反射型/存储型/DOM 型七道全通 · 三类 sink↔三种投递壳 · iframe+onload 投递机制与同源边界实测 · 尖括号被 HTML 实体编码时的属性注入解法 · 零交互属性（autofocus+onfocus / animation）实测 · jQuery 选择器 sink 版本边界（≤1.8.3） · 编码/解码链** |
+| **2026-09-12(续)** | **PortSwigger SSRF 模块前三关 — 回显型:服务端代请求打本机 /admin 与内网后端(Intruder 扫段) · 盲打型:注入点在 Referer 头,Burp Collaborator 收 DNS+HTTP 带外信号 · Collaborator 原理(唯一子域/四步套路/三通道对比) · 盲打三问自检 · 排错:自测通路先于查投递点** |
 
 ---
 
