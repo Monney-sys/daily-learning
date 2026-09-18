@@ -120,7 +120,7 @@ if not token or token != session.get('csrf'): reject()
 
 ---
 
-## SSRF 服务端请求伪造 — 已完成 3/7（2026-09-12 开始）
+## SSRF 服务端请求伪造 — 已完成 5/7（2026-09-12 开始）
 
 > 关联笔记：[PortSwigger SSRF 前三关实战与 Collaborator 认知](./2026-09-12(续)-PortSwigger-SSRF前三关与Collaborator.md)
 > 7 关递进：回显型（打本机/打内网）→ 盲打 OOB → 黑名单绕过 → 开放重定向绕过 → Shellshock 盲打 → 白名单绕过
@@ -130,6 +130,8 @@ if not token or token != session.get('csrf'): reject()
 | 1 | Basic SSRF against the local server | 回显型 SSRF（服务端代你访问本机） | 商品页 Check stock 的 `stockApi` 换成 `http://localhost/admin` → 从返回 HTML 读删除链接 → `stockApi=http://localhost/admin/delete?username=carlos` |
 | 2 | Basic SSRF against another back-end system | 回显型 + 内网探测 | `stockApi=http://192.168.0.1:8080/admin`，末位八位组设 Intruder Numbers payload 1→255 → 状态码 200 那条就是内网 admin → 改路径 `/admin/delete?username=carlos` |
 | 3 | Blind SSRF with out-of-band detection | **盲打**（不回显，靠带外信号）+ 注入点在**请求头** | 商品页文档请求的 `Referer` 域名段换成 Burp Collaborator 域 → Send → Collaborator Poll now → 出现 DNS + HTTP（Source IP = 靶场）= 过关 |
+| 4 | SSRF with blacklist-based input filter | 黑名单绕过（后端拦 `localhost` / `127.0.0.1`） | 环回地址等价写法绕过：`127.1` / 十进制 `2130706433` / 八进制 `0177.0.0.1` / 十六进制 `0x7f000001` → 打内网 admin 删 carlos |
+| 5 | SSRF with filter bypass via open redirection | 白名单 + 开放重定向绕过 | 用站点自身 open-redirect 接口当跳板（`path=` 参数指向内网 `192.168.0.1:8080/admin/delete?username=carlos`）→ 先过白名单再拐进内网 |
 
 ### SSRF 知识点总结（我的版本）
 
@@ -289,7 +291,7 @@ username=carlos&password=xxx
 
 ## 下一阶段
 
-- **SSRF 模块进行中（3/7）**：第 4 关 = SSRF with blacklist-based input filter（黑名单绕过 → 环回地址等价写法：`127.1` / 十进制 `2130706433` / 八进制 / 十六进制 / 大小写变体）；之后 开放重定向绕过 → Shellshock 盲打 → whitelist 绕过
+- **SSRF 模块进行中（5/7）**：剩 2 关 = 第 6 关 Blind SSRF with Shellshock（盲打 + `User-Agent` 注入 Shellshock → RCE）、第 7 关 SSRF with whitelist-based input filter（EXPERT，白名单绕过 `@`/`#`/`?` 解析差异）
 - **CSRF 暂停（4/11）**：下一关 = CSRF where token is tied to non-session cookie；另待补第 3 关的对照实验（POST + 删 csrf 是否通过）
 - **XSS 模块进行中（7/30）**：下一道 = Stored XSS into anchor href attribute with double quotes HTML-encoded（#8，payload 用 `javascript:`）
 - **Authentication 收尾**：剩 1 道 —— 2FA bypass using a brute-force attack（Lab 14，EXPERT，关键 = Burp Macro + Session handling rule）
