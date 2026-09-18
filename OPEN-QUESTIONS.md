@@ -111,6 +111,8 @@
 | 2026-09-04 | LogonTracer -z 时区怎么定（课程示例 -13 来历？中国机器一般填几）？导入后的登录关系图怎么读（哪些图形特征=爆破/异常）？与人工 4624/4625 排查如何互相印证？ | [应急响应-数据库应急与漏洞口令检索](./2026-09-04-应急响应-数据库应急与漏洞口令检索.md) | |
 | 2026-09-12 | Lab（DOM XSS in jQuery selector sink using a hashchange event）真实 sink 的拼接行是哪种形态？本地实测只有 ≤1.8.3 的 `:contains()` 拼接形态能打到执行，待去 DevTools 抄下真实代码对照 | [PortSwigger-XSS实战前七题](./2026-09-12-PortSwigger-XSS实战前七题.md) | |
 | 2026-09-12 | PortSwigger 受害者机器人到底会触发哪些事件？官方 Hint 说「你能弹 ≠ 受害者能弹、要多试几个属性」，说明它触发的事件集合有限，值得整理一份可用属性白名单 | [PortSwigger-XSS实战前七题](./2026-09-12-PortSwigger-XSS实战前七题.md) | |
+| 2026-09-18 | Burp 的 Inspector/参数面板里改 multipart 的 filename，会不会把 `%` 二次编码（`..%2f` 变成 `..%252f`）？和切到 raw 视图手改有什么差别？ | [PortSwigger文件上传模块实战](./2026-09-18(续)-PortSwigger文件上传模块实战.md) | 待验证：两种改法各发一次，对比服务端回显的存储路径 |
+| 2026-09-18 | 现代 Apache + mod_php 默认把哪些后缀交给 PHP？（Debian 的 php 模块用 FilesMatch 正则匹配 `.phar` / `.php` / `.phtml`，这就是 `.phar`、`.phtml` 常常自带 handler 的原因吗？） | [PortSwigger文件上传模块实战](./2026-09-18(续)-PortSwigger文件上传模块实战.md) | 待在自己 phpStudy 上核对 httpd.conf 与 php 模块配置 |
 ## 已解决
 
 （空）

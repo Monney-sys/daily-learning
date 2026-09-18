@@ -143,6 +143,30 @@ if not token or token != session.get('csrf'): reject()
 
 ---
 
+## 文件上传 — 已完成 2/7（2026-09-18 开始）
+
+> 关联笔记：[PortSwigger 文件上传实战（决策型：先看现象→判定卡在第几层→查表拿钥匙）](./2026-09-18(续)-PortSwigger文件上传模块实战.md)
+> ⚠️ **Lab 1-2 是否已做过待你确认**（我不替你断言）；已确认通关的是 Lab 3、Lab 4
+> 模块 7 关递进：无过滤 → Content-Type 绕过 → **路径穿越** → **后缀黑名单** → 混淆扩展名（空字节）→ polyglot 图片马 → 条件竞争
+
+| # | Lab | 核心考点 | 攻击手法 |
+|---|-----|---------|---------|
+| 1 | Remote code execution via web shell upload | 无任何过滤 | （是否已做待确认） |
+| 2 | Web shell upload via Content-Type restriction bypass | 只校验 Content-Type | （是否已做待确认） |
+| 3 | Web shell upload via path traversal | **能上传 ≠ 能执行**（该目录关了执行）+ 文件名路径穿越 | GET `/files/avatars/exploit.php` 回**源码纯文本**=该目录不解析 → 只有 **POST 的 `filename`** 能改落盘位置（改 GET 的文件名没用）→ `filename="../exploit.php"` 被剥成 `avatars/exploit.php` → 编码斜杠 `filename="..%2fexploit.php"` 回显带 `../` 即绕过（**先清洗后解码**）→ GET `/files/avatars/..%2fexploit.php` 得 secret |
+| 4 | Web shell upload via extension blacklist bypass | 后缀黑名单 + **配置层**绕过（题眼：黑名单的"配置"有根本缺陷） | `.php3` 能传但**不解析**（引擎映射表里没这一行）→ 传 `.htaccess`（**Content-Type 改 `text/plain`**）用 `AddType application/x-httpd-php .自造后缀` 把后缀映射成 PHP → 回原请求把 payload 后缀换成同一个 → GET 时响应头出现 `Set-Cookie`/`text/html` = 执行（⚠️ `.htaccess` 无后缀，黑名单从设计上抓不到它） |
+
+### 文件上传知识点总结（我的版本 · 决策向）
+
+- **两层模型**：应用层管「能不能落盘」（黑白名单 / Content-Type / 内容检测 / 字段名）；服务器层管「能不能执行」（后缀 → handler 映射表、目录是否允许执行）。**绕第一层 ≠ RCE**。
+- **「不解析」两条分岔（先分岔再选钥匙）**：① **位置问题** —— 目录执行被关 → 路径穿越写到可执行目录（Lab 3）；② **类型问题** —— 我的后缀不被引擎认 → 改映射（Apache `.htaccess` / IIS `web.config` / PHP-FPM `.user.ini`）（Lab 4）；③ **没有脚本引擎**（Flask/Node）→ 换同源 XSS / SSTI。
+- **执行判据看响应头，不看内容**：`text/plain`+`Last-Modified`=静态直出；`text/html`+`Set-Cookie`=已执行；`304`=浏览器缓存障眼法（带 `?v=1` 重发）。
+- **先定栈再定手法**：响应头 `Server` 决定能不能用 `.htaccess`（nginx 没有目录级配置，这条路不存在）。
+- **免费探针**：上传响应回显存储路径 / `.htaccess` 写非法指令看是否 500（=哨兵，证明它被读了）。
+- 详见笔记[「三、决策卡」](./2026-09-18(续)-PortSwigger文件上传模块实战.md)。
+
+---
+
 ## 知识点总结
 
 ### 越权的四种模式
@@ -291,6 +315,7 @@ username=carlos&password=xxx
 
 ## 下一阶段
 
+- **文件上传模块进行中（2/7，Lab 1-2 待确认）**：下一关 = Lab 5 Web shell upload via obfuscated file extension（混淆扩展名，玩**空字节截断**），然后 Lab 6 polyglot 图片马、Lab 7 race condition
 - **SSRF 模块进行中（5/7）**：剩 2 关 = 第 6 关 Blind SSRF with Shellshock（盲打 + `User-Agent` 注入 Shellshock → RCE）、第 7 关 SSRF with whitelist-based input filter（EXPERT，白名单绕过 `@`/`#`/`?` 解析差异）
 - **CSRF 暂停（4/11）**：下一关 = CSRF where token is tied to non-session cookie；另待补第 3 关的对照实验（POST + 删 csrf 是否通过）
 - **XSS 模块进行中（7/30）**：下一道 = Stored XSS into anchor href attribute with double quotes HTML-encoded（#8，payload 用 `javascript:`）
