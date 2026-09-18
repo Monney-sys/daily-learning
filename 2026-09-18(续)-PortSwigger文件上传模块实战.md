@@ -113,6 +113,15 @@ Lab 4 的 `.php3` 就是活教材：黑名单放行了它，但引擎映射表�
 ---
 
 ## 四、Lab 3：Web shell upload via path traversal
+### 3.5 第一层的两个实证（Lab 1 / Lab 2）
+
+| Lab | 服务端检查什么 | 钥匙 |
+|---|---|---|
+| 1 Remote code execution via web shell upload | **什么都不查** | 直接传 `.php` → GET 即执行（零防护，不需要任何绕过） |
+| 2 Web shell upload via Content-Type restriction bypass | **只查 Content-Type**（不看后缀、不看内容） | 只改它检查的那一个维度：multipart 里文件 part 的 `Content-Type: image/jpeg` |
+
+⇒ **判据：服务端"看什么"，我就"改什么"** —— 绕过永远针对它实际检查的那个维度，别做无用功。
+
 
 **题目**：头像上传。服务器"禁止执行用户提供的文件"，要拿到 `/home/carlos/secret` 并提交。
 

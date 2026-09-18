@@ -143,22 +143,23 @@ if not token or token != session.get('csrf'): reject()
 
 ---
 
-## 文件上传 — 已完成 2/7（2026-09-18 开始）
+## 文件上传 — 已完成 4/7（2026-09-18 开始）
 
 > 关联笔记：[PortSwigger 文件上传实战（决策型：先看现象→判定卡在第几层→查表拿钥匙）](./2026-09-18(续)-PortSwigger文件上传模块实战.md)
-> ⚠️ **Lab 1-2 是否已做过待你确认**（我不替你断言）；已确认通关的是 Lab 3、Lab 4
+> 已通关 Lab 1-4（Lab 1-2 按官方标准解法记录，若我当时的操作有出入，告一声我改）
 > 模块 7 关递进：无过滤 → Content-Type 绕过 → **路径穿越** → **后缀黑名单** → 混淆扩展名（空字节）→ polyglot 图片马 → 条件竞争
 
 | # | Lab | 核心考点 | 攻击手法 |
 |---|-----|---------|---------|
-| 1 | Remote code execution via web shell upload | 无任何过滤 | （是否已做待确认） |
-| 2 | Web shell upload via Content-Type restriction bypass | 只校验 Content-Type | （是否已做待确认） |
+| 1 | Remote code execution via web shell upload | 零验证（无任何过滤） | 建 `exploit.php`（内容 `<?php echo file_get_contents('/home/carlos/secret'); ?>`）当头像传上去 → 从"加载头像的 GET"认出存储目录 → 直接 GET `/files/avatars/exploit.php` → 响应里就是 secret（零防护，不需要任何绕过） |
+| 2 | Web shell upload via Content-Type restriction bypass | **只校验 Content-Type**（不看后缀、不看内容） | 同一个 `exploit.php`，在 multipart 里把文件 part 的 `Content-Type` 改成 `image/jpeg` → 通过校验 → GET 即执行 |
 | 3 | Web shell upload via path traversal | **能上传 ≠ 能执行**（该目录关了执行）+ 文件名路径穿越 | GET `/files/avatars/exploit.php` 回**源码纯文本**=该目录不解析 → 只有 **POST 的 `filename`** 能改落盘位置（改 GET 的文件名没用）→ `filename="../exploit.php"` 被剥成 `avatars/exploit.php` → 编码斜杠 `filename="..%2fexploit.php"` 回显带 `../` 即绕过（**先清洗后解码**）→ GET `/files/avatars/..%2fexploit.php` 得 secret |
 | 4 | Web shell upload via extension blacklist bypass | 后缀黑名单 + **配置层**绕过（题眼：黑名单的"配置"有根本缺陷） | `.php3` 能传但**不解析**（引擎映射表里没这一行）→ 传 `.htaccess`（**Content-Type 改 `text/plain`**）用 `AddType application/x-httpd-php .自造后缀` 把后缀映射成 PHP → 回原请求把 payload 后缀换成同一个 → GET 时响应头出现 `Set-Cookie`/`text/html` = 执行（⚠️ `.htaccess` 无后缀，黑名单从设计上抓不到它） |
 
 ### 文件上传知识点总结（我的版本 · 决策向）
 
 - **两层模型**：应用层管「能不能落盘」（黑白名单 / Content-Type / 内容检测 / 字段名）；服务器层管「能不能执行」（后缀 → handler 映射表、目录是否允许执行）。**绕第一层 ≠ RCE**。
+- **第一层的两个极端（Lab 1 / Lab 2）**：Lab 1 **什么都不查**（传 `.php` 直接可执行）；Lab 2 **只查 Content-Type**（不看后缀、不看内容）→ 只改它检查的那一个维度：multipart 里该 part 的 `Content-Type: image/jpeg`。⇒ **判据：服务端「看什么」，我就「改什么」**，绕过只针对它实际检查的那个维度，别做无用功。
 - **「不解析」两条分岔（先分岔再选钥匙）**：① **位置问题** —— 目录执行被关 → 路径穿越写到可执行目录（Lab 3）；② **类型问题** —— 我的后缀不被引擎认 → 改映射（Apache `.htaccess` / IIS `web.config` / PHP-FPM `.user.ini`）（Lab 4）；③ **没有脚本引擎**（Flask/Node）→ 换同源 XSS / SSTI。
 - **执行判据看响应头，不看内容**：`text/plain`+`Last-Modified`=静态直出；`text/html`+`Set-Cookie`=已执行；`304`=浏览器缓存障眼法（带 `?v=1` 重发）。
 - **先定栈再定手法**：响应头 `Server` 决定能不能用 `.htaccess`（nginx 没有目录级配置，这条路不存在）。
