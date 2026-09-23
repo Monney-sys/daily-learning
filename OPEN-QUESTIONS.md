@@ -58,6 +58,9 @@
 | 2026-08-28 | nmap --script=*smb* 的 smb-vuln-ms09-050 为什么会在 Samba 2.2 上误报 CVE-2009-3103？（检测逻辑哪一步误判） | [Kioptrix1靶机渗透实战](./2026-08-28(续2)-Kioptrix1靶机渗透实战.md) | |
 | 2026-08-28 | meterpreter 分阶段 payload 的 1MB stage 在老内核上具体崩在哪一步？（符号解析/mprotect？） | [Kioptrix1靶机渗透实战](./2026-08-28(续2)-Kioptrix1靶机渗透实战.md) | |
 | 2026-08-28 | sambal.c 绑定 shell 的端口 45295 是 shellcode 硬编码的吗？能改吗？ | [Kioptrix1靶机渗透实战](./2026-08-28(续2)-Kioptrix1靶机渗透实战.md) | |
+| 2026-09-23 | Oracle 无 XML 解析权限（或 `xmltype`/`EXTRACTVALUE` 被禁）时，还有哪些可用出网原语？（`UTL_INADDR.get_host_address` / `UTL_HTTP.request` 需要什么权限、默认开不开） | [SQL注入盲注四信道](./2026-09-23-PortSwigger-SQL注入盲注四信道与WAF编码绕过.md) | 待实测 |
+| 2026-09-23 | 带外带数据遇大写字母/特殊字符会丢（DNS 会小写化、域名有长度限制）—— 实战的分段与编码方案怎么排（hex 编码 / `SUBSTR` 分段 / 多级子域）？ | [SQL注入盲注四信道](./2026-09-23-PortSwigger-SQL注入盲注四信道与WAF编码绕过.md) | 待实践 |
+| 2026-09-23 | Hackvertor 的 `dec_entities` 与 `hex_entities` 有什么区别？不装扩展时手工把 payload 编成 XML 实体的最省事做法是什么？ | [SQL注入盲注四信道](./2026-09-23-PortSwigger-SQL注入盲注四信道与WAF编码绕过.md) | 待试 |
 | 2026-08-28 | 环境变量（PATH 劫持）提权的完整利用链？（root 的什么脚本/程序会被劫持？怎么构造？） | [Linux提权-总体框架](./2026-08-28(续2)-Linux提权-总体框架.md) | 待对照课程视频 |
 | 2026-08-28 | 8 项信息收集有没有现成的自动化脚本/工具？（LinEnum / linux-exploit-suggester？） | [Linux提权-总体框架](./2026-08-28(续2)-Linux提权-总体框架.md) | |
 | 2026-08-28 | 第三方服务提权具体覆盖哪些？（数据库/中间件/容器 docker？边界在哪？） | [Linux提权-总体框架](./2026-08-28(续2)-Linux提权-总体框架.md) | |

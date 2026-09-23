@@ -62,6 +62,7 @@
 | WAF 绕过技术体系 + SQLi-Labs Less-5/6/7 实战 — 双写/大小写/内联注释/编码绕过 | [2026-07-30-SQL注入WAF绕过.md](./2026-07-30-SQL注入WAF绕过.md) |
 | **SQLi-Labs Less-17~20 进阶** — UPDATE/INSERT/Cookie 注入 + 消费法闭合 + 注入点识别方法论 | [2026-08-02-SQLi-Labs进阶与注入点识别.md](./2026-08-02-SQLi-Labs进阶与注入点识别.md) |
 | **SQLi-Labs Less-21~25 进阶** — Cookie+Base64 / 注释符过滤 / 二次注入 / AND/OR 关键字绕过 + 内联注释拆词为什么失效 | [2026-08-03-SQLi-Labs-Less21-25进阶.md](./2026-08-03-SQLi-Labs-Less21-25进阶.md) |
+| **PortSwigger SQL 注入模块 18/18 通关收官（盲注四代信道 + XML 编码绕过 WAF）** — 盲注骨架三段（存在性→长度→逐位） · 四代信道对照（内容 `Welcome back` / 报错 500 / 延时 10000ms / 带外 Collaborator） · payload 四种接法决策卡（AND 要 boolean、UNION 要回显、双竖线拼接要配平引号、分号堆叠要驱动支持） · 方言矩阵（Oracle = dual + ROWNUM + SUBSTR + TO_CHAR(1/0) / PG = pg_sleep + 堆叠 / MySQL = concat） · OOB = SQLi × XXE 借 XML 解析器当出网嘴，数据拼进子域名带出 · 编码层数 = 解码层数 · 踩坑：双编码 %253f 收不到回连、Intruder 延时判定必须单并发 | [2026-09-23-PortSwigger-SQL注入盲注四信道与WAF编码绕过.md](./2026-09-23-PortSwigger-SQL注入盲注四信道与WAF编码绕过.md) |
 
 ### XSS 跨站脚本
 | 主题 | 文件 |
@@ -257,6 +258,7 @@
 | **2026-09-12(续)** | **PortSwigger SSRF 模块前三关 — 回显型:服务端代请求打本机 /admin 与内网后端(Intruder 扫段) · 盲打型:注入点在 Referer 头,Burp Collaborator 收 DNS+HTTP 带外信号 · Collaborator 原理(唯一子域/四步套路/三通道对比) · 盲打三问自检 · 排错:自测通路先于查投递点** |
 | **2026-09-16(续)** | **CCP 实操带练：文件包含 → RCE → 上传绕过 — DVWA 文件包含四档全通（`///etc/passwd` 绝对路径证明零过滤 → `php://filter`+base64 读源码/读 config 拿凭据 → 不加编码仍被执行(出现两个主页) → medium 双写 `....//` → high `file:///etc/passwd` 绕前缀白名单）· 命令执行四档全通（low 分号 / medium 竖线 / high `| |whoami` 双写 / impossible explode + is_numeric + **重建值**） · upload-labs 20 关检测逻辑逐关源码核对 + 通用绕过十阶梯（前端 / MIME / 后缀黑名单 / 归一化 / 白名单+解析漏洞 / 内容检测 / 二次渲染 / 条件竞争 / 参数可控） · 亲手打通 上传+包含=RCE 图片马链 · 三种“读不了”排错口诀（空白 / 500 / Base64）· 踩坑 8 条** |
 | **2026-09-18(续)** | **PortSwigger 文件上传模块实战（Lab 1-4 全通：零防护 / Content-Type 绕过 / 路径穿越 / 后缀黑名单绕过） — 核心认知：能上传与能执行是两套独立系统 · 「不解析」先分岔再选钥匙（位置问题→`..%2f` 穿越 / 类型问题→`.htaccess` 改后缀映射 / 没引擎→换 XSS·SSTI）· 响应头判执行 · `.htaccess` 速查与哨兵技巧 · 本机实测「PHP 不看后缀」· 踩坑：先清洗后解码、`.php3` 能传不解析、`l33t` vs `133t` 形近字符** |
+| **2026-09-23** | **PortSwigger SQL 注入模块收官（18/18）— 盲注四代信道全打通：①内容信道(`Welcome back` + Intruder Grep-Match) ②报错信道(Oracle `TO_CHAR(1/0)` → 500；dual/ROWNUM/SUBSTR 三件套) ③延时信道(PG `pg_sleep` + 分号堆叠；为何不能用 AND：`pg_sleep` 返回 void 不是 boolean；Intruder 单并发 + Response received 找 ~10s) ④带外信道(SQLi × XXE 借 `xmltype` 出网 → Collaborator 收 DNS+HTTP；域名中段换子查询把密码带出) · 四种接法决策卡(AND/UNION/双竖线拼接/分号堆叠) · 五方言矩阵 · XML 实体编码过 WAF(Hackvertor hex_entities) · 编码层数=解码层数 · 踩坑：双编码 %253f 收不到回连、延时关括号位置错导致全程无 10s、Collaborator 32 位唯一子域别当密码** |
 
 ---
 
