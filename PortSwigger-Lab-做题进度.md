@@ -46,10 +46,10 @@
 | 12 | Password brute-force via password change | 改密接口爆破（锁定逻辑缺陷） | 两次新密码填不一致 → 错误当前密码不触发锁定可无限爆破；响应含 New passwords do not match 即密码正确（隐藏 username 字段改成 carlos）（今天新做） |
 | 13 | Broken brute-force protection, multiple credentials per request | 单请求多凭据（计数粒度缺陷，EXPERT） | JSON 登录 body 的 password 改数组塞全部候选密码 → 一次请求试完 → 302 命中（2026-08-14 通关） |
 
-## XSS 跨站脚本 — 已完成 13/30（2026-09-12 开始，2026-09-28 更新）
+## XSS 跨站脚本 — 已完成 15/30（2026-09-12 开始，2026-09-28 更新）
 
 > 关联笔记：[PortSwigger XSS 实战前七题](./2026-09-12-PortSwigger-XSS实战前七题.md)（含三张实测表：上下文→向量 / 属性→自动触发 / jQuery 版本边界）
-> ⚠️ 2026-09-28 记录：本日连打 #8 / #9 / #11 / #12 / #13 / #15（按官方 all-labs 序号）；**#10（DOM XSS in document.write sink inside a select element）与 #14（most tags and attributes blocked）本次会话未提及** —— 若其实已过，告一声我补行；#16（some SVG markup allowed）进行中。
+> ⚠️ 2026-09-28 记录：本日连打 #8 / #9 / #10 / #11 / #12 / #13 / #14 / #15（按官方 all-labs 序号），#16（some SVG markup allowed）进行中。#10、#14 我未参与，按官方解法补记 —— 若我当时的做法与此不同，告一声我改。
 
 | # | Lab | 核心考点 | 攻击手法 |
 |---|-----|---------|---------|
@@ -62,9 +62,11 @@
 | 7 | Reflected XSS into attribute with angle brackets HTML-encoded | 尖括号被 HTML 实体编码 | 闭合引号 + 加事件属性（`"autofocus onfocus="print()`，或官方 `"onmouseover=`）；要多试属性直到受害者能触发 |
 | 8 | Stored XSS into anchor href attribute with double quotes HTML-encoded | 属性上下文 · 引号被编码 → 不闭合、改走「协议」 | 评论的 Website 字段进 `<a href="…">`；`"` 被 HTML 实体编码 ⇒ 闭合引号这条常规路被堵死 → **不闭合**，直接用 URL 伪协议 `javascript:alert(1)` → 点评论作者名触发。（`<script>` 写在属性里只是普通字符串、永远不会执行 —— 那是上下文不对，**不是被过滤**） |
 | 9 | Reflected XSS into a JavaScript string with angle brackets HTML encoded | JS **字符串**上下文（HTML 实体编码在此完全无效） | 落点 `<script>var searchTerms='输入'</script>`；尖括号被编码不构成障碍，真正的边界是**单引号**（未转义）→ 闭合后**必须补一个运算符**才能续接表达式：`'-alert(1)-'`（`''-alert(1)-''` 合法；只闭合不加运算符 `''alert(1)''` → SyntaxError）；`';alert(1)//` 同样可过，官方选 `-` 因更短且不依赖注释 |
+| 10 | DOM XSS in document.write sink using source location.search inside a select element | DOM 型 + 输入落在 **`<select>` 内部** | 商品页的 `storeId` 被 `document.write` 拼进 `<select>` 里的 `<option>` → **`<select>` 内部只认 option/optgroup，其它标签会被解析器直接丢掉** ⇒ 必须先 `"></select>` 把 select 关掉、再插标签：`?productId=1&storeId="></select><img src=1 onerror=alert(1)>` |
 | 11 | DOM XSS in AngularJS expression with angle brackets and double quotes HTML-encoded | **客户端模板注入**（同一段输入被解析两次） | 页面有 `ng-app` → AngularJS 把 `{{ }}` 当**表达式**求值（服务端只做了 HTML 实体编码，防错了对象）→ 判据 `{{7*7}}` 显示 49；payload `{{$on.constructor('alert(1)')()}}`（`constructor → Function` 是「数据→代码」的桥，`$on` 只是手边任意一个函数、并不特殊）。实测沙箱：1.4.4 / 1.5.8 两条路都被 `isecfn` 拦，1.6.0 起沙箱移除、两条都通 |
 | 12 | Reflected DOM XSS | **`eval` sink** + 服务端转义表漏了一个字符 | `searchResults.js` 里 `eval('var searchResultsObj = ' + this.responseText)`；服务端**只转义 `"`、不转义反斜杠** → payload `\"-alert(1)}//`：多给的反斜杠让输出成 `\\"`（转义被抵消 → 字符串闭合）→ `-` 续接表达式 → `}` 关掉对象 → `//` 吃掉尾巴。⚠️ 判据看 **F12 Elements**（DOM 型响应体里只有 JSON，没有渲染结果） |
 | 13 | Stored DOM XSS | 客户端过滤器**只替换第一次** | `loadCommentsWithVulnerableEscapeHtml.js` 的 `escapeHTML` = `replace('<','&lt;').replace('>','&gt;')`（第一个参数是**字符串** ⇒ 每个字符只替第一处）→ 诱饵 payload `<><img src=1 onerror=alert(1)>`；⭐ 规律 = **替换几次就喂几个诱饵**；探针 `<<>>` 直接量次数；Console 里可调 `escapeHTML()` 当 oracle 问它 |
+| 14 | Reflected XSS into HTML context with most tags and attributes blocked | 白名单测绘 + 换「能自己触发」的事件 | Intruder 两轮摸白名单（cheat sheet 的 tags / events 清单，**400 = 拦、200 = 过**）→ 只剩 `<body>` + `onresize` ⇒ payload `"><body onresize=print()>`；`onresize` 靠**尺寸变化**触发、加载时不自触发 → exploit server 用 iframe 补触发源：`<iframe src="https://LAB/?search=%22%3E%3Cbody%20onresize=print()%3E" onload=this.style.width='100px'>` → Store → Deliver（改 iframe 宽度 ⇒ 内部视口变化 ⇒ body 的 resize 事件） |
 | 15 | Reflected XSS into HTML context with all tags blocked except custom ones | 白名单只放行**自定义标签** + **片段聚焦**当触发源 | payload `<xss id=x onfocus=alert(document.cookie) tabindex=1>`，URL 末尾加 `#x`；三个零件 = `onfocus`（执行什么）+ `tabindex`（让它**可聚焦**，否则 focus 事件永不触发）+ `#x`（**片段导航会聚焦 id 匹配的元素** ⇒ 零交互）；投递仍走 exploit server 的 `location=` |
 
 ### XSS 知识点总结
@@ -431,6 +433,6 @@ username=carlos&password=xxx
 - **文件上传模块进行中（4/7）**：下一关 = Lab 5 Web shell upload via obfuscated file extension（混淆扩展名，玩**空字节截断**），然后 Lab 6 polyglot 图片马、Lab 7 race condition
 - **SSRF 模块进行中（5/7）**：剩 2 关 = 第 6 关 Blind SSRF with Shellshock （盲打 + `User-Agent` 注入 Shellshock → RCE）、第 7 关 SSRF with whitelist-based input filter（EXPERT，白名单绕过 `@`/`#`/`?` 解析差异）
 - **CSRF 暂停（4/11）**：下一关 = CSRF where token is tied to non-session cookie；另待补第 3 关的对照实验（POST + 删 csrf 是否通过）
-- **XSS 模块进行中（13/30）**：本次（2026-09-28）连打 #8 / #9 / #11 / #12 / #13 / #15；当前在 **#16 Reflected XSS with some SVG markup allowed**（考点 = **命名空间**：`<svg>` 是 `onbegin` 生效的前提）；之后 = #17 Reflected XSS in canonical link tag → #18/#19 JS 字符串变体（单引号 / 反斜杠被转义）→ #20 onclick → #21 模板字符串 → 后半段（CSP / AngularJS sandbox escape / 偷 cookie）
+- **XSS 模块进行中（15/30）**：本次（2026-09-28）连打 #8 / #9 / #10 / #11 / #12 / #13 / #14 / #15；当前在 **#16 Reflected XSS with some SVG markup allowed**（考点 = **命名空间**：`<svg>` 是 `onbegin` 生效的前提）；之后 = #17 Reflected XSS in canonical link tag → #18/#19 JS 字符串变体（单引号 / 反斜杠被转义）→ #20 onclick → #21 模板字符串 → 后半段（CSP / AngularJS sandbox escape / 偷 cookie）
 - **Authentication 收尾**：剩 1 道 —— 2FA bypass using a brute-force attack（Lab 14，EXPERT，关键 = Burp Macro + Session handling rule）
 - **XXE 进行中（2/9）**：Lab 3/4/5 盲打三连待做（需要 Collaborator / exploit server 收外带请求）
